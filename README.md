@@ -1,2 +1,2 @@
-# OdongDiary
-Odong Diary App Android Version
+# OwnDiary
+Your Own Diary App Android Version
