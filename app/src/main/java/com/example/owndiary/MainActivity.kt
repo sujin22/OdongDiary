@@ -1,4 +1,4 @@
-package com.example.odongdiary
+package com.example.owndiary
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,18 +10,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.odongdiary.ui.theme.OdongDiaryTheme
+import com.example.owndiary.ui.theme.OwnDiaryTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            OdongDiaryTheme {
+            OwnDiaryTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                     Greeting("Android")
                 }
             }
@@ -37,7 +34,7 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    OdongDiaryTheme {
+    OwnDiaryTheme {
         Greeting("Android")
     }
 }

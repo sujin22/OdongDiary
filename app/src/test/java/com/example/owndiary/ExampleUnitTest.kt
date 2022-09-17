@@ -1,4 +1,4 @@
-package com.example.odongdiary
+package com.example.owndiary
 
 import org.junit.Test
 
