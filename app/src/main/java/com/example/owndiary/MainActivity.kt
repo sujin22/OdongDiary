@@ -56,8 +56,8 @@ class MainActivity : ComponentActivity() {
                         onValueChange = setValue,
                     )
                     Button(onClick = {
-                        //코루틴 실행
                         keyboardController?.hide()
+                        //코루틴 실행g
                         scope.launch{
                             scaffoldState.snackbarHostState.showSnackbar("Hello $text")
                         }
