@@ -43,135 +43,38 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val viewModel = viewModel<MainViewModel>()
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ){
-                Text(
-                    viewModel.data.value,
-                    fontSize = 30.sp,
-                )
-                Button(onClick={
-                    viewModel.changValue()
-                }){
-                    Text("변경")
-                }
-            }
+            HomeScreen()
         }
     }
 }
 
+@Composable
+fun HomeScreen(){
+//    val text = remember{
+//        mutableStateOf("Hello World")
+//    }
+//
+//    val (text, setText) = remember{
+//        mutableStateOf("Hello World")
+//    }
+
+    var text by remember{
+        mutableStateOf("Hello World")
+    }
+    Column(){
+        Text("Hello World")
+        Button(onClick = {
+            text = "변경"
+        }){
+            Text("클릭")
+        }
+    }
+}
 class MainViewModel: ViewModel(){
-    private val _data = mutableStateOf("Hello")
-    val data: State<String> = _data //읽기 전용으로 생성
+    private val _value = mutableStateOf("Hello World")
+    val value: State<String> = _value
 
-    fun changValue(){
-        _data.value = "World"
-    }
-}
-
-
-@Composable
-fun FirstScreen(navController: NavController){
-    val (value, setValue) = remember{
-        mutableStateOf("")
-    }
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement =  Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ){
-        Text(text ="첫 화면")
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            navController.navigate("second")
-        }){
-            Text("두 번째!")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(value = value, onValueChange = setValue)
-        Button(onClick = {
-            if(value.isNotEmpty()){
-                navController.navigate("third/$value")
-            }
-        }){
-            Text("세 번째!")
-        }
-    }
-}
-@Composable
-fun SecondScreen(navController: NavController){
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement =  Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ){
-        Text(text ="두 번째 화면")
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            navController.navigateUp()
-//            navController.popBackStack()
-        }){
-            Text("뒤로 가기")
-        }
-    }
-}
-@Composable
-fun ThirdScreen(navController: NavController, value: String){
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement =  Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ){
-        Text(text ="세 번째 화면")
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(value)
-        Button(onClick = {
-            navController.navigateUp()
-        }){
-            Text("뒤로 가기")
-        }
-    }
-}
-
-
-@Composable
-fun ImageCard(
-    modifier: Modifier = Modifier, //기본값 지정
-    isFavorite: Boolean,
-    onTabFavorite: (Boolean) -> Unit,//Callback 생성
-) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        elevation = 5.dp,
-    ) {
-        Box(
-            modifier = Modifier.height(200.dp)
-        ) {
-            Image(
-                painterResource(id = R.drawable.poster),
-                contentDescription = "poster",
-                contentScale = ContentScale.Crop,
-            )
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.TopEnd,
-            ) {
-                IconButton(onClick = {
-                    //onTabFavorite.invoke(!isFavorite) //invoke는 생략 가능하다.
-                    onTabFavorite(!isFavorite)
-                }) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Default.Favorite
-                        else Icons.Default.FavoriteBorder,
-                        contentDescription = "favorite",
-                        tint = Color.White
-                    )
-                }
-            }
-        }
+    fun changeValue(value: String){
+        _value.value = value
     }
 }
