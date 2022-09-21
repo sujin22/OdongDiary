@@ -1,8 +1,10 @@
 package com.example.owndiary
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,6 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,30 +39,40 @@ import com.example.owndiary.ui.theme.OwnDiaryTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
-
-            NavHost(
-                navController = navController,
-                startDestination = "first",
+            val viewModel = viewModel<MainViewModel>()
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
             ){
-                composable("first"){
-                    FirstScreen(navController)
-                }
-                composable("second"){
-                    SecondScreen(navController)
-                }
-                composable("third/{value}"){backStackEntry ->
-                    ThirdScreen(
-                        navController = navController,
-                        value = backStackEntry.arguments?.getString("value") ?: "")
+                Text(
+                    viewModel.data.value,
+                    fontSize = 30.sp,
+                )
+                Button(onClick={
+                    viewModel.changValue()
+                }){
+                    Text("변경")
                 }
             }
         }
     }
 }
+
+class MainViewModel: ViewModel(){
+    private val _data = mutableStateOf("Hello")
+    val data: State<String> = _data //읽기 전용으로 생성
+
+    fun changValue(){
+        _data.value = "World"
+    }
+}
+
+
 @Composable
 fun FirstScreen(navController: NavController){
     val (value, setValue) = remember{
