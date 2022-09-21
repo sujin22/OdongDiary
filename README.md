@@ -1,2 +1,2 @@
 # OwnDiary
-Your Own Diary App Android Version
+Your Own Diary App
