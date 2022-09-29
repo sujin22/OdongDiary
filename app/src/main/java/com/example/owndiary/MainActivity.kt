@@ -1,6 +1,8 @@
 package com.example.owndiary
 
+import android.graphics.Paint.Align
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -21,42 +23,67 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            HomeScreen()
+            val modalBottomSheetState = rememberModalBottomSheetState(
+                initialValue = ModalBottomSheetValue.Hidden
+            )
+            val scaffoldState = rememberScaffoldState()//scaffold state
+            val coroutineScope = rememberCoroutineScope()
+
+            ModalBottomSheetLayout(
+                modifier = Modifier.fillMaxHeight(),
+                sheetState = modalBottomSheetState,
+                sheetContent = {
+                    SettingContent()
+                },
+                sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            ){
+                Scaffold(
+                    modifier = Modifier.fillMaxHeight(),
+                    scaffoldState = scaffoldState,
+                    content = { padding ->  // We need to pass scaffold's inner padding to content. That's why we use Box.
+                        Box(modifier = Modifier.padding(padding)) {
+                            HomeScreen(coroutineScope, modalBottomSheetState)
+                        }
+                    }
+                )
+            }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Preview(showBackground = true)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBottomSheetState) {
     var diaryList = rememberSaveable {
         mutableListOf(
             DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!",false),
-            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
+            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!",false),
+            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!",false),
+            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!",false),
+            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!",false),
+            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!",false),
+            DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!",false),
         )
     }
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 backgroundColor = Color(0xFF6799FF),
-                onClick = { /*TODO*/ }
+                onClick = {/*TODO*/ }
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -73,10 +100,9 @@ fun HomeScreen() {
                 .fillMaxSize()
                 .background(color = Color(0xFFEBF7FF))
         ) {
-            TopBar()
-
+            TopBar(coroutineScope, modalBottomSheetState)
             LazyVerticalGrid(
-                cells =GridCells.Fixed(2)
+                cells =GridCells.Fixed(2),
             ){
                 itemsIndexed(
                     diaryList
@@ -90,12 +116,52 @@ fun HomeScreen() {
 
         }
     }
+
 }
 
-
-
 @Composable
-fun TopBar() {
+fun SettingContent(){
+    Surface(
+        modifier = Modifier
+            .fillMaxHeight(0.9f)
+        ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFB2CCFF)),
+            horizontalAlignment = Alignment.CenterHorizontally,){
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(30.dp)
+                    .wrapContentHeight(Alignment.CenterVertically),
+                shape = RoundedCornerShape(8.dp),
+                backgroundColor = Color(0xFFEBF7FF)
+                
+            ) {
+                Column(modifier = Modifier.padding(20.dp)){
+                    Text(
+                        text = "Diary Name")
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent,
+                            ),
+                        value ="",
+                        onValueChange = {},
+                    )
+                }
+            }
+        }
+    }
+
+
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun TopBar(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBottomSheetState) {
     var isDropDownMenuExpended by remember {
         mutableStateOf(false)
     }
@@ -134,7 +200,11 @@ fun TopBar() {
             text = "Own Diary",
             fontSize = 25.sp,
         )
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = {
+            coroutineScope.launch{
+                modalBottomSheetState.animateTo(ModalBottomSheetValue.Expanded)
+            }
+        }) {
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "setting",
@@ -158,7 +228,7 @@ fun ImageCard(
     Card(
         modifier = Modifier
             .fillMaxWidth(0.5f)
-            .padding(16.dp)
+            .padding(10.dp)
             .wrapContentHeight(Alignment.CenterVertically),
         shape = RoundedCornerShape(8.dp),
         elevation = 5.dp,
@@ -166,10 +236,11 @@ fun ImageCard(
     ) {
         Column(
             modifier = Modifier
-                .padding(5.dp),
+                .padding(10.dp),
         ) {
             Box(
-                modifier = Modifier.height(120.dp),
+                modifier = Modifier
+                    .height(130.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
