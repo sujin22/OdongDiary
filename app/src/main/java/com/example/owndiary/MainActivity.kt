@@ -2,18 +2,23 @@ package com.example.owndiary
 
 import android.graphics.Paint.Align
 import android.os.Bundle
+import android.text.style.UnderlineSpan
 import android.util.Log
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -22,12 +27,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.owndiary.ui.theme.BlueHeavy
+import com.example.owndiary.ui.theme.BlueLight
+import com.example.owndiary.ui.theme.BlueMiddle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -82,7 +93,7 @@ fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBotto
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                backgroundColor = Color(0xFF6799FF),
+                backgroundColor = BlueHeavy,
                 onClick = {/*TODO*/ }
             ) {
                 Icon(
@@ -98,7 +109,7 @@ fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBotto
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color(0xFFEBF7FF))
+                .background(color = BlueLight)
         ) {
             TopBar(coroutineScope, modalBottomSheetState)
             LazyVerticalGrid(
@@ -121,6 +132,9 @@ fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBotto
 
 @Composable
 fun SettingContent(){
+    val (text, setValue) = remember {
+        mutableStateOf("")
+    }
     Surface(
         modifier = Modifier
             .fillMaxHeight(0.9f)
@@ -128,29 +142,70 @@ fun SettingContent(){
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFB2CCFF)),
-            horizontalAlignment = Alignment.CenterHorizontally,){
+                .background(BlueMiddle),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ){
+            /*TODO: 확인 버튼 - 얘만 오른쪽 정렬*/
+            //Diary Name
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(30.dp)
+                    .padding(top = 30.dp, start = 30.dp, end = 30.dp)
                     .wrapContentHeight(Alignment.CenterVertically),
                 shape = RoundedCornerShape(8.dp),
-                backgroundColor = Color(0xFFEBF7FF)
-                
+                backgroundColor = BlueLight
             ) {
-                Column(modifier = Modifier.padding(20.dp)){
-                    Text(
-                        text = "Diary Name")
-                    TextField(
+                Column(modifier = Modifier.padding(10.dp)){
+                    Text( "Diary Name")
+                    Spacer(Modifier.height(10.dp))
+                    Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.textFieldColors(
-                            backgroundColor = Color.Transparent,
-                            ),
-                        value ="",
-                        onValueChange = {},
-                    )
+                            .height(40.dp)
+                            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                            .padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ){
+                        BasicTextField(
+                            value = text,
+                            onValueChange = setValue,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                    }
+
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            //Color Picker
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp)
+                    .wrapContentHeight(Alignment.CenterVertically),
+                shape = RoundedCornerShape(8.dp),
+                backgroundColor = BlueLight
+            ) {
+                Column(modifier = Modifier.padding(10.dp)){
+                    Text( "Color")
+                    Spacer(Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier
+                            .height(40.dp)
+                            .border(1.dp, Color.LightGray, CircleShape)
+                            .padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ){
+                        BasicTextField(
+                            value = text,
+                            onValueChange = setValue,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    /*TODO: 기록 삭제 버튼*/
                 }
             }
         }
@@ -232,7 +287,7 @@ fun ImageCard(
             .wrapContentHeight(Alignment.CenterVertically),
         shape = RoundedCornerShape(8.dp),
         elevation = 5.dp,
-        backgroundColor = Color(0xFFB2CCFF)
+        backgroundColor = BlueMiddle
     ) {
         Column(
             modifier = Modifier
