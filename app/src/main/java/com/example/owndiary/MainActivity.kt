@@ -12,10 +12,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -36,9 +33,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.owndiary.ui.theme.BlueHeavy
-import com.example.owndiary.ui.theme.BlueLight
-import com.example.owndiary.ui.theme.BlueMiddle
+import com.example.owndiary.ui.theme.*
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -93,7 +89,7 @@ fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBotto
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                backgroundColor = BlueHeavy,
+                backgroundColor = Blue.heavy,
                 onClick = {/*TODO*/ }
             ) {
                 Icon(
@@ -109,7 +105,7 @@ fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBotto
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = BlueLight)
+                .background(color = Blue.light)
         ) {
             TopBar(coroutineScope, modalBottomSheetState)
             LazyVerticalGrid(
@@ -130,6 +126,7 @@ fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBotto
 
 }
 
+@Preview
 @Composable
 fun SettingContent(){
     val (text, setValue) = remember {
@@ -142,18 +139,36 @@ fun SettingContent(){
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BlueMiddle),
+                .background(Blue.middle),
             horizontalAlignment = Alignment.CenterHorizontally,
         ){
-            /*TODO: 확인 버튼 - 얘만 오른쪽 정렬*/
+            Spacer(Modifier.height(10.dp))
+
+            //확인 버튼
+            Button(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .align(Alignment.End)
+                    .padding(end = 30.dp),
+                onClick = {
+                    /*TODO: 버튼 클릭 시 동작*/
+                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Blue.heavy),
+                shape = RoundedCornerShape(8.dp),
+            ){
+                Text(
+                    text = "적용",
+                )
+            }
+            Spacer(Modifier.height(10.dp))
             //Diary Name
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 30.dp, start = 30.dp, end = 30.dp)
+                    .padding(horizontal = 30.dp)
                     .wrapContentHeight(Alignment.CenterVertically),
                 shape = RoundedCornerShape(8.dp),
-                backgroundColor = BlueLight
+                backgroundColor = Blue.light
             ) {
                 Column(modifier = Modifier.padding(10.dp)){
                     Text( "Diary Name")
@@ -173,7 +188,6 @@ fun SettingContent(){
                                 .fillMaxWidth()
                         )
                     }
-
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -184,30 +198,33 @@ fun SettingContent(){
                     .padding(horizontal = 30.dp)
                     .wrapContentHeight(Alignment.CenterVertically),
                 shape = RoundedCornerShape(8.dp),
-                backgroundColor = BlueLight
+                backgroundColor = Blue.light
             ) {
                 Column(modifier = Modifier.padding(10.dp)){
                     Text( "Color")
                     Spacer(Modifier.height(10.dp))
-                    Row(
-                        modifier = Modifier
-                            .height(40.dp)
-                            .border(1.dp, Color.LightGray, CircleShape)
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ){
-                        BasicTextField(
-                            value = text,
-                            onValueChange = setValue,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        )
-                    }
+                    PaletteCard()
                     Spacer(Modifier.height(8.dp))
-                    /*TODO: 기록 삭제 버튼*/
                 }
             }
+            Spacer(Modifier.height(10.dp))
+
+            //일기장 초기화 버튼
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp),
+                shape = RoundedCornerShape(8.dp),
+                onClick = {
+                    /*TODO: 일기장 초기화 클릭 시 동작*/
+                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Blue.light)
+            ){
+                Text(
+                    text = "일기장 초기화",
+                    color = Color.Red,
+                )
+           }
         }
     }
 
@@ -287,7 +304,7 @@ fun ImageCard(
             .wrapContentHeight(Alignment.CenterVertically),
         shape = RoundedCornerShape(8.dp),
         elevation = 5.dp,
-        backgroundColor = BlueMiddle
+        backgroundColor = Blue.middle
     ) {
         Column(
             modifier = Modifier
@@ -331,5 +348,33 @@ fun ImageCard(
                 maxLines = 2,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun PaletteCard(){
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ){
+       itemsIndexed(
+           listOf(
+               Red, Pink, Yellow, Blue, Green, Purple, Navy
+           )
+       ){index, item ->
+           Button(
+               modifier = Modifier
+                   .size(40.dp, 40.dp)
+                   .padding(5.dp, 5.dp),
+               onClick = {
+                 /*TODO: color 클릭 시 동작*/
+               },
+               colors = ButtonDefaults.buttonColors(backgroundColor = item.heavy),
+               shape = RoundedCornerShape(8.dp),
+           ){
+           }
+       }
     }
 }
