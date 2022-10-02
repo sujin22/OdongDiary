@@ -6,6 +6,7 @@ import android.text.style.UnderlineSpan
 import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -49,6 +50,12 @@ class MainActivity : ComponentActivity() {
             )
             val scaffoldState = rememberScaffoldState()//scaffold state
             val coroutineScope = rememberCoroutineScope()
+
+            BackHandler(enabled = modalBottomSheetState.isVisible) {
+                coroutineScope.launch{
+                    modalBottomSheetState.hide()
+                }
+            }
 
             ModalBottomSheetLayout(
                 modifier = Modifier.fillMaxHeight(),
