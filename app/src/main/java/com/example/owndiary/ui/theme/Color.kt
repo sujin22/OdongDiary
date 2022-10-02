@@ -7,6 +7,10 @@ val Purple500 = Color(0xFF6200EE)
 val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
+//Gray
+val LightGray = Color(0xFFEAEAEA)
+val DarkGray = Color(0xFF8C8C8C)
+
 //Blue
 val Blue = PaletteItem(
     Color(0xFFD9E5FF),

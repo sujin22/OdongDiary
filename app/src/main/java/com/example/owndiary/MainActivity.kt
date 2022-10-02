@@ -8,10 +8,7 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
@@ -378,7 +375,6 @@ fun ImageCard(
     }
 }
 
-@Preview
 @Composable
 fun PaletteCard(){
     LazyRow(
@@ -406,13 +402,118 @@ fun PaletteCard(){
     }
 }
 
+//Preview 없앨 때 defaultParameter 지우기
+@Preview
 @Composable
-fun NewDiaryScreen(navController: NavController){
-    Button(
-        onClick = {
-            navController.navigateUp()  //뒤로가기
-        }
+fun NewDiaryScreen(navController: NavController = rememberNavController()){
+    var isEditState = true
+    var isImageLoaded = true
+
+    Column(
+        modifier = Modifier
+            .background(Blue.light)
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.Start,
     ){
-        Text(text = "뒤로가기")
+        //bar area
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ){
+            IconButton(
+                modifier = Modifier
+                    .wrapContentWidth(),
+                onClick = {
+                    navController.navigateUp()  //뒤로가기
+                },
+            ){
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "back",
+                    tint = Blue.heavy,
+                )
+            }
+            if(isEditState){
+                Row{
+                    Button(
+                        modifier = Modifier
+                            .width(40.dp),
+                        onClick = {
+                            /*TODO*/
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Blue.middle),
+                        contentPadding = PaddingValues(0.dp)
+                    ){
+                        Icon(
+                            imageVector = Icons.Default.DeleteOutline,
+                            contentDescription = "back",
+                            tint = Blue.heavy,
+                        )
+                    }
+                    Button(
+                        modifier = Modifier.padding(horizontal=5.dp),
+                        onClick = {
+                            /*TODO*/
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Blue.heavy)
+                    ){
+                        Text("완료")
+                    }
+                }
+            }else{
+                Button(
+                    modifier = Modifier.padding(horizontal = 5.dp),
+                    onClick = {
+                        /*TODO*/
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Blue.heavy)
+                ){
+                    Text("편집")
+                }
+            }
+        }
+
+        //Image area
+        if(isImageLoaded){
+            Image(
+                painterResource(id = R.drawable.poster),
+                contentDescription = "image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .padding(10.dp),
+            )
+        } else{
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .padding(10.dp),
+                onClick = {/*TODO*/},
+                colors = ButtonDefaults.buttonColors(backgroundColor = LightGray)
+            ){
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "load",
+                    tint = Blue.heavy,
+                    modifier = Modifier.size(50.dp)
+                )
+            }
+        }
+
+        //Date Area
+        Text(
+            text = "2022.10.02",
+            color = DarkGray,
+            fontSize = 15.sp,
+            modifier = Modifier
+                .padding(start = 10.dp),
+        )
+
+        //Title Area
+
+
     }
+
 }
