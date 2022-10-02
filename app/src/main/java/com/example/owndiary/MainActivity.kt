@@ -34,6 +34,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.owndiary.ui.theme.*
 
 import kotlinx.coroutines.CoroutineScope
@@ -51,29 +55,41 @@ class MainActivity : ComponentActivity() {
             val scaffoldState = rememberScaffoldState()//scaffold state
             val coroutineScope = rememberCoroutineScope()
 
+            val navController = rememberNavController()
+
+            NavHost(
+                navController = navController,
+                startDestination = "home",
+            ){
+                composable("home"){
+                    ModalBottomSheetLayout(
+                        modifier = Modifier.fillMaxHeight(),
+                        sheetState = modalBottomSheetState,
+                        sheetContent = {
+                            SettingContent(modalBottomSheetState, coroutineScope)
+                        },
+                        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+                    ){
+                        Scaffold(
+                            modifier = Modifier.fillMaxHeight(),
+                            scaffoldState = scaffoldState,
+                            content = { padding ->  // We need to pass scaffold's inner padding to content. That's why we use Box.
+                                Box(modifier = Modifier.padding(padding)) {
+                                    HomeScreen(coroutineScope, modalBottomSheetState, navController)
+                                }
+                            }
+                        )
+                    }
+                }
+                composable("new_diary"){
+                    NewDiaryScreen(navController)
+                }
+            }
+
             BackHandler(enabled = modalBottomSheetState.isVisible) {
                 coroutineScope.launch{
                     modalBottomSheetState.hide()
                 }
-            }
-
-            ModalBottomSheetLayout(
-                modifier = Modifier.fillMaxHeight(),
-                sheetState = modalBottomSheetState,
-                sheetContent = {
-                    SettingContent(modalBottomSheetState, coroutineScope)
-                },
-                sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-            ){
-                Scaffold(
-                    modifier = Modifier.fillMaxHeight(),
-                    scaffoldState = scaffoldState,
-                    content = { padding ->  // We need to pass scaffold's inner padding to content. That's why we use Box.
-                        Box(modifier = Modifier.padding(padding)) {
-                            HomeScreen(coroutineScope, modalBottomSheetState)
-                        }
-                    }
-                )
             }
         }
     }
@@ -81,7 +97,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBottomSheetState) {
+fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBottomSheetState, navController: NavController) {
     var diaryList = rememberSaveable {
         mutableListOf(
             DiaryItem(R.drawable.poster,"2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!",false),
@@ -97,7 +113,9 @@ fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBotto
         floatingActionButton = {
             FloatingActionButton(
                 backgroundColor = Blue.heavy,
-                onClick = {/*TODO*/ }
+                onClick = {
+                    navController.navigate("new_diary")
+                }
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -385,5 +403,16 @@ fun PaletteCard(){
            ){
            }
        }
+    }
+}
+
+@Composable
+fun NewDiaryScreen(navController: NavController){
+    Button(
+        onClick = {
+            navController.navigateUp()  //뒤로가기
+        }
+    ){
+        Text(text = "뒤로가기")
     }
 }
