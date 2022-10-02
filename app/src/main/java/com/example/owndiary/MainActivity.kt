@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxHeight(),
                 sheetState = modalBottomSheetState,
                 sheetContent = {
-                    SettingContent()
+                    SettingContent(modalBottomSheetState, coroutineScope)
                 },
                 sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
             ){
@@ -133,9 +133,9 @@ fun HomeScreen(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBotto
 
 }
 
-@Preview
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SettingContent(){
+fun SettingContent(modalBottomSheetState: ModalBottomSheetState, coroutineScope: CoroutineScope){
     val (text, setValue) = remember {
         mutableStateOf("")
     }
@@ -158,7 +158,9 @@ fun SettingContent(){
                     .align(Alignment.End)
                     .padding(end = 30.dp),
                 onClick = {
-                    /*TODO: 버튼 클릭 시 동작*/
+                    coroutineScope.launch{
+                        modalBottomSheetState.hide()
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Blue.heavy),
                 shape = RoundedCornerShape(8.dp),
