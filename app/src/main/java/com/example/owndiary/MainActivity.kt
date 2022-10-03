@@ -602,7 +602,35 @@ fun NewDiaryScreen(navController: NavController = rememberNavController()) {
 
         //Context Area
         val (context, setContext) = remember {
-            mutableStateOf("")
+            mutableStateOf("야호!\n" +
+                    "룸을 생각해야되는데\n" +
+                    "룸을 먼저 할 까.. 아니면\n" +
+                    "갤러리 연동을 먼저 할까??\n" +
+                    "뭘 먼저 할지는 생각야호!\n" +
+                    "룸을 생각해야되는데\n" +
+                    "룸을 먼저 할 까.. 아니면\n" +
+                    "갤러리 연동을 먼저 할까??\n" +
+                    "뭘 먼저 할지는 생각을 좀 해보고~\n" +
+                    "음 ~~ 일단 아이고아이고 재미있구나 야호\n" +
+                    "바로 이렇게 되어서 다행이에요\n" +
+                    "그렇지요야호!\n" +
+                    "룸을 생각해야되는데\n" +
+                    "룸을 먼저 할 까.. 아니면\n" +
+                    "갤러리 연동을 먼저 할까??\n" +
+                    "뭘 먼저 할지는 생각을 좀 해보고~\n" +
+                    "음 ~~ 일단 아이고아이고 재미있구나 야호\n" +
+                    "바로 이렇게 되어서 다행이에요\n" +
+                    "그렇지요을 좀 해보고~\n" +
+                    "음 ~~ 일단 아이고아이고 재미있구나 야호\n" +
+                    "바로 이렇게 되어서 다행이에요\n" +
+                    "그렇지요야호!\n" +
+                    "룸을 생각해야되는데\n" +
+                    "룸을 먼저 할 까.. 아니면\n" +
+                    "갤러리 연동을 먼저 할까??\n" +
+                    "뭘 먼저 할지는 생각을 좀 해보고~\n" +
+                    "음 ~~ 일단 아이고아이고 재미있구나 야호\n" +
+                    "바로 이렇게 되어서 다행이에요\n" +
+                    "그렇지요")
         }
 
         BasicTextField(
@@ -610,7 +638,8 @@ fun NewDiaryScreen(navController: NavController = rememberNavController()) {
             onValueChange = setContext,
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 10.dp),
+                .padding(horizontal = 10.dp)
+                .verticalScroll(rememberScrollState()),
             textStyle = TextStyle(fontSize = 15.sp),
             decorationBox = { innerTextField ->
                 if (context.isEmpty()) {
