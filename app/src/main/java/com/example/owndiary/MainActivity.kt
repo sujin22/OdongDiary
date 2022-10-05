@@ -1,25 +1,22 @@
 package com.example.owndiary
 
-import android.graphics.Paint.Align
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
-import android.text.style.UnderlineSpan
 import android.util.Log
-import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -29,33 +26,62 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.owndiary.model.Diary
 import com.example.owndiary.ui.theme.*
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        const val REVIEW_MIN_LENGTH = 10
+
+        //갤러리 권한 요청
+        const val REQ_GALLERY = 1
+
+        //API 호출시 Paremeter key값
+        const val PARAM_KEY_IMAGE = "image"
+        const val PARAM_KEY_PRODUCT_ID = "product_id"
+        const val PARAM_KEY_REVIEW = "review_content"
+        const val PARAM_KEY_RATING = "rating"
+    }
+    /*
+    private val imageResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()){ result ->
+        if(result.resultCode == RESULT_OK){
+            //이미지를 받으면 ImageView에 적용한다.
+            val imageUri = result.data?.data
+            imageUri?.let{
+                //서버 업로드를 위해 파일 형태로 변환한다.
+                imageFile = File(getRealPathFromURI(it))
+
+                //이미지를 불러온다
+                Glide.with(this)
+                    .load(imageUri)
+                    .fitCenter()
+                    .apply(RequestOptions().override(500,500))
+                    .into(binding.writeReviewLayout.addImageBtn)
+            }
+        }
+    }
+    */
+
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +95,10 @@ class MainActivity : ComponentActivity() {
             val coroutineScope = rememberCoroutineScope()
 
             val navController = rememberNavController()
+
+            var diaryList = remember{
+                mutableStateListOf<Diary>()
+            }
 
             NavHost(
                 navController = navController,
@@ -88,14 +118,44 @@ class MainActivity : ComponentActivity() {
                             scaffoldState = scaffoldState,
                             content = { padding ->  // We need to pass scaffold's inner padding to content. That's why we use Box.
                                 Box(modifier = Modifier.padding(padding)) {
-                                    HomeScreen(coroutineScope, modalBottomSheetState, navController)
+
+                                    HomeScreen(
+                                        diaryList,
+                                        coroutineScope, modalBottomSheetState, navController
+                                    )
                                 }
                             }
                         )
                     }
                 }
                 composable("new_diary") {
-                    NewDiaryScreen(navController)
+                    WriteDiaryScreen(
+                        onAddDiary = {
+                            diaryList.add(it)
+                        },
+                        isNew = true,
+                        navController = navController
+                    )
+                }
+                composable("detail_diary/{index}") {backStackEntry ->
+                    val indexStr = backStackEntry.arguments?.getString("index") ?:"-1"
+                    val index = indexStr.toInt();
+                    Log.e("ImageCard_Clicked", "Index is $index")
+
+                    //remove했을 때 recomposition되어 title, content, date index 접근에서 outOfBounds 에러 발생
+                    //-> 쿼리 적용 전, 임시 방편으로 예외 처리 해주었음
+                    //TODO: 쿼리 적용 후, list 수정에 따른 리컴포지션으로 수정할 것
+                    WriteDiaryScreen(
+                        diary = if(index<diaryList.size) diaryList[index] else null,
+                        onRemoveDiary = {
+                            diaryList.removeAt(index)
+                        },
+                        onEditDiary = {diary ->
+                            diaryList[index] =  diary
+                        },
+                        isNew = false,
+                        navController = navController
+                    )
                 }
             }
 
@@ -111,20 +171,21 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
+    notes: List<Diary>,
     coroutineScope: CoroutineScope,
     modalBottomSheetState: ModalBottomSheetState,
     navController: NavController
 ) {
-    var diaryList = rememberSaveable {
-        mutableListOf(
-            DiaryItem(R.drawable.poster, "2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster, "2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster, "2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster, "2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster, "2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster, "2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-            DiaryItem(R.drawable.poster, "2022.09.23", "이건 내가 정말 좋아하는 영화인 어바웃타임의 포스터!!!", false),
-        )
+    //For Gallery
+    val context = LocalContext.current
+    val activity = LocalContext.current as MainActivity
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        when (it.resultCode) {
+
+        }
     }
     Scaffold(
         floatingActionButton = {
@@ -153,19 +214,19 @@ fun HomeScreen(
             LazyVerticalGrid(
                 cells = GridCells.Fixed(2),
             ) {
-                itemsIndexed(
-                    diaryList
-                ) { index, item ->
+                itemsIndexed(notes) { index, item ->
                     ImageCard(
-                        content = item.text,
-                        favorite = item.isFavorite
+                        diary = item,
+                        onDiaryClicked = {
+                            Log.e("ImageCard_Clicked", "Yes It Click $index")
+                            navController.navigate("detail_diary/$index")
+                        }
                     )
                 }
             }
 
         }
     }
-
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -223,13 +284,14 @@ fun TopBar(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBottomShe
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ImageCard(
-    content: String,
-    favorite: Boolean,
+    diary: Diary,
+    onDiaryClicked:() -> Unit,
 ) {
     var isFavorite by rememberSaveable {
-        mutableStateOf(favorite)
+        mutableStateOf(diary.isFavorite)
     }
     val onTabFavorite: (Boolean) -> Unit = { favorite ->
         isFavorite = favorite
@@ -238,10 +300,14 @@ fun ImageCard(
         modifier = Modifier
             .fillMaxWidth(0.5f)
             .padding(10.dp)
-            .wrapContentHeight(Alignment.CenterVertically),
+            .wrapContentHeight(Alignment.CenterVertically)
+            .clickable {},
         shape = RoundedCornerShape(8.dp),
         elevation = 5.dp,
-        backgroundColor = Blue.middle
+        backgroundColor = Blue.middle,
+        onClick = {
+            onDiaryClicked()
+        }
     ) {
         Column(
             modifier = Modifier
@@ -252,11 +318,13 @@ fun ImageCard(
                     .height(130.dp),
                 contentAlignment = Alignment.Center
             ) {
+                //Image area
                 Image(
                     painterResource(id = R.drawable.poster),
                     contentDescription = "image",
                     contentScale = ContentScale.Crop,
                 )
+                //Favorite area
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.TopEnd,
@@ -273,14 +341,24 @@ fun ImageCard(
                     }
                 }
             }
+            //Date Area
             Text(
                 modifier = Modifier
-                    .padding(0.dp, 5.dp),
-                text = "2022.09.23",
+                    .padding(vertical = 5.dp),
+                text = diary.date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd EEE")),
                 fontSize = 12.sp,
             )
+            //Title Area
             Text(
-                text = content,
+                modifier = Modifier
+                    .padding(bottom = 5.dp),
+                text = diary.title,
+                fontSize = 12.sp,
+            )
+
+            //Content Area
+            Text(
+                text = diary.content,
                 fontSize = 12.sp,
                 maxLines = 2,
             )
@@ -422,13 +500,30 @@ fun PaletteCard() {
     }
 }
 
-//Preview 없앨 때 defaultParameter 지우기
-@Preview
+
 @Composable
-fun NewDiaryScreen(navController: NavController = rememberNavController()) {
-    var isEditState by remember { mutableStateOf(true) }
-    var isImageLoaded by remember { mutableStateOf(false) }
+fun WriteDiaryScreen(
+    navController: NavController,
+    isNew: Boolean,
+    diary: Diary? = null,
+//    diaryImage: Bitmap? = null,
+//    diaryTitle: String = "",
+//    diaryContent: String = "",
+//    diaryDate: LocalDateTime = LocalDateTime.now(),
+    onAddDiary: (Diary) -> Unit = {},
+    onRemoveDiary: () -> Unit = {},
+    onEditDiary: (Diary) -> Unit = {},
+) {
+    var isEditState by remember { mutableStateOf(isNew)}
+    var isImageLoaded by remember { mutableStateOf(!isNew) }
     val focusManager = LocalFocusManager.current
+
+    val (title, setTitle) = remember {
+        mutableStateOf(diary?.title?:"")
+    }
+    val (content, setContent) = remember {
+        mutableStateOf(diary?.content?:"")
+    }
 
     Column(
         modifier = Modifier
@@ -437,8 +532,7 @@ fun NewDiaryScreen(navController: NavController = rememberNavController()) {
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     focusManager.clearFocus()
-                }
-                )
+                })
             },
 
         horizontalAlignment = Alignment.Start,
@@ -465,9 +559,27 @@ fun NewDiaryScreen(navController: NavController = rememberNavController()) {
                 Button(
                     modifier = Modifier.padding(horizontal = 5.dp),
                     onClick = {
-                        isEditState = false
-                        focusManager.clearFocus()
-                        /*TODO: 내용 저장하기*/
+                        //HomeScreen 리스트에 내용 저장하기
+                        if(isNew){
+                            //add
+                            onAddDiary(
+                                Diary(
+                                    image = diary?.image,
+                                    title = title,
+                                    content = content,
+                                )
+                            )
+                        }else{
+                            //edit
+                            onEditDiary(
+                                Diary(
+                                    image = diary?.image,
+                                    title = title,
+                                    content = content,
+                                )
+                            )
+                        }
+                        navController.navigateUp()  //뒤로가기
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Blue.heavy)
                 ) {
@@ -481,6 +593,10 @@ fun NewDiaryScreen(navController: NavController = rememberNavController()) {
                             .width(40.dp),
                         onClick = {
                             /*TODO: 이 일기 삭제하기*/
+//                                  id로 삭제하는 쿼리로 수정
+//                                  onRemoveDiary(diary.id)
+                                  onRemoveDiary()
+                            navController.navigateUp()  //뒤로가기
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = Blue.middle),
                         contentPadding = PaddingValues(0.dp)
@@ -547,9 +663,6 @@ fun NewDiaryScreen(navController: NavController = rememberNavController()) {
         )
 
         //Title Area
-        val (title, setTitle) = remember {
-            mutableStateOf("")
-        }
         val maxChar = 15
 
         BasicTextField(
@@ -600,49 +713,17 @@ fun NewDiaryScreen(navController: NavController = rememberNavController()) {
             modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
         )
 
-        //Context Area
-        val (context, setContext) = remember {
-            mutableStateOf("야호!\n" +
-                    "룸을 생각해야되는데\n" +
-                    "룸을 먼저 할 까.. 아니면\n" +
-                    "갤러리 연동을 먼저 할까??\n" +
-                    "뭘 먼저 할지는 생각야호!\n" +
-                    "룸을 생각해야되는데\n" +
-                    "룸을 먼저 할 까.. 아니면\n" +
-                    "갤러리 연동을 먼저 할까??\n" +
-                    "뭘 먼저 할지는 생각을 좀 해보고~\n" +
-                    "음 ~~ 일단 아이고아이고 재미있구나 야호\n" +
-                    "바로 이렇게 되어서 다행이에요\n" +
-                    "그렇지요야호!\n" +
-                    "룸을 생각해야되는데\n" +
-                    "룸을 먼저 할 까.. 아니면\n" +
-                    "갤러리 연동을 먼저 할까??\n" +
-                    "뭘 먼저 할지는 생각을 좀 해보고~\n" +
-                    "음 ~~ 일단 아이고아이고 재미있구나 야호\n" +
-                    "바로 이렇게 되어서 다행이에요\n" +
-                    "그렇지요을 좀 해보고~\n" +
-                    "음 ~~ 일단 아이고아이고 재미있구나 야호\n" +
-                    "바로 이렇게 되어서 다행이에요\n" +
-                    "그렇지요야호!\n" +
-                    "룸을 생각해야되는데\n" +
-                    "룸을 먼저 할 까.. 아니면\n" +
-                    "갤러리 연동을 먼저 할까??\n" +
-                    "뭘 먼저 할지는 생각을 좀 해보고~\n" +
-                    "음 ~~ 일단 아이고아이고 재미있구나 야호\n" +
-                    "바로 이렇게 되어서 다행이에요\n" +
-                    "그렇지요")
-        }
-
+        //Content Area
         BasicTextField(
-            value = context,
-            onValueChange = setContext,
+            value = content,
+            onValueChange = setContent,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 10.dp)
                 .verticalScroll(rememberScrollState()),
             textStyle = TextStyle(fontSize = 15.sp),
             decorationBox = { innerTextField ->
-                if (context.isEmpty()) {
+                if (content.isEmpty()) {
                     Text(
                         text = "내용을 입력하세요.",
                         color = DarkGray,
@@ -654,4 +735,14 @@ fun NewDiaryScreen(navController: NavController = rememberNavController()) {
             enabled = isEditState,
         )
     }
+}
+
+private fun setImageBitmap(uri: Uri) {
+//    val bitmap = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+//        ImageDecoder.decodeBitmap(
+//            ImageDecoder.createSource(contentResolver, uri)
+//        )
+//    }else{
+//        MediaStore.Images.Media.getBitmap(contentResolver, uri)
+//    }
 }
