@@ -1,5 +1,7 @@
 package com.example.owndiary.ui.screen
 
+import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -27,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.owndiary.MainActivity
 import com.example.owndiary.R
 import com.example.owndiary.model.Diary
 import com.example.owndiary.ui.theme.Blue
@@ -42,17 +45,17 @@ fun WriteDiaryScreen(
     diary: Diary? = null,
     onAddDiary: (Diary) -> Unit = {},
     onRemoveDiary: (Diary) -> Unit = {},
-    onEditDiary: (Int, Diary) -> Unit = {index, item ->},
+    onEditDiary: (Diary) -> Unit = {},
 ) {
     var isEditState by remember { mutableStateOf(isNew) }
     var isImageLoaded by remember { mutableStateOf(!isNew) }
     val focusManager = LocalFocusManager.current
 
     val (title, setTitle) = remember {
-        mutableStateOf(diary?.title?:"")
+        mutableStateOf(diary?.title ?: "")
     }
     val (content, setContent) = remember {
-        mutableStateOf(diary?.content?:"")
+        mutableStateOf(diary?.content ?: "")
     }
 
     Column(
@@ -90,27 +93,28 @@ fun WriteDiaryScreen(
                     modifier = Modifier.padding(horizontal = 5.dp),
                     onClick = {
                         //HomeScreen 리스트에 내용 저장하기
-                        if(isNew){
+                        if (isNew) {
                             //add
                             onAddDiary(
                                 Diary(
-                                    image = diary?.image,
+                                    //TODO: 갤러리에서 불러온 image 넣어야 함
+                                    image = Bitmap.createScaledBitmap(
+                                        MainActivity.bitmapImage,
+                                        400,
+                                        300,
+                                        true
+                                    ),
                                     title = title,
                                     content = content,
                                 )
                             )
-                        }else{
+                        } else {
                             //edit
                             if (diary != null) {
-                                onEditDiary(
-                                    //TODO: Room 적용 이후에는 id 통해 삭제해야 함
-                                    index,
-                                    Diary(
-                                        image = diary?.image,
-                                        title = title,
-                                        content = content,
-                                    )
-                                )
+                                Log.d("UPDATE_DIARY", "id(Screen): ${diary.id}")
+                                diary.title = title
+                                diary.content = content
+                                onEditDiary(diary)
                             }
                         }
                         navController.navigateUp()  //뒤로가기
@@ -126,9 +130,6 @@ fun WriteDiaryScreen(
                         modifier = Modifier
                             .width(40.dp),
                         onClick = {
-                            /*TODO: 이 일기 삭제하기*/
-//                                  id로 삭제하는 쿼리로 수정
-//                                  onRemoveDiary(diary.id)
                             if (diary != null) {
                                 onRemoveDiary(diary)
                             }

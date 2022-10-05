@@ -1,5 +1,9 @@
 package com.example.owndiary
 
+import android.annotation.SuppressLint
+import android.database.CursorWindow
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -9,45 +13,34 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.owndiary.model.Diary
 import com.example.owndiary.ui.screen.DiaryViewModel
 import com.example.owndiary.ui.screen.HomeScreen
 import com.example.owndiary.ui.screen.SettingScreen
 import com.example.owndiary.ui.screen.WriteDiaryScreen
 import com.example.owndiary.ui.theme.*
-
-import kotlinx.coroutines.CoroutineScope
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import java.lang.reflect.Field
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     companion object {
+        lateinit var bitmapImage: Bitmap
         const val REVIEW_MIN_LENGTH = 10
 
         //갤러리 권한 요청
@@ -80,11 +73,17 @@ class MainActivity : ComponentActivity() {
     }
     */
 
-    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
+        try {
+            val field: Field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
+            field.setAccessible(true)
+            field.set(null, 100 * 1024 * 1024) //the 100MB is the new size
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         setContent {
             OwnDiaryTheme{
                 Surface(
@@ -92,6 +91,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ){
                     val diaryViewModel: DiaryViewModel by viewModels()
+                    bitmapImage = BitmapFactory.decodeResource(resources, R.drawable.poster)
                     OwnDiaryApp(diaryViewModel)
                 }
             }
@@ -99,10 +99,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OwnDiaryApp(diaryViewModel: DiaryViewModel = viewModel()){
-    val diaryList = diaryViewModel.getAllDiary()
+    val diaryList = diaryViewModel.diaryList
     val modalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
     )
@@ -130,7 +131,7 @@ fun OwnDiaryApp(diaryViewModel: DiaryViewModel = viewModel()){
                     content = { padding ->  // We need to pass scaffold's inner padding to content. That's why we use Box.
                         Box(modifier = Modifier.padding(padding)) {
                             HomeScreen(
-                                diaryList,
+                                diaryList.value,
                                 coroutineScope, modalBottomSheetState, navController
                             )
                         }
@@ -150,14 +151,11 @@ fun OwnDiaryApp(diaryViewModel: DiaryViewModel = viewModel()){
             val index = indexStr.toInt();
             Log.e("ImageCard_Clicked", "Index is $index")
 
-            //remove했을 때 recomposition되어 title, content, date index 접근에서 outOfBounds 에러 발생
-            //-> 쿼리 적용 전, 임시 방편으로 예외 처리 해주었음
-            //TODO: 쿼리 적용 후, list 수정에 따른 리컴포지션으로 수정할 것
             WriteDiaryScreen(
                 index = index,
-                diary = if(index<diaryList.size) diaryList[index] else null,
+                diary = diaryList.value[index],
                 onRemoveDiary = diaryViewModel::removeDiary,
-                onEditDiary = diaryViewModel::editDiary,
+                onEditDiary = diaryViewModel::updateDiary,
                 isNew = false,
                 navController = navController
             )
