@@ -1,4 +1,4 @@
-package com.example.owndiary.screen
+package com.example.owndiary.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.owndiary.components.PaletteCard
+import com.example.owndiary.ui.components.PaletteCard
 import com.example.owndiary.ui.theme.Blue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

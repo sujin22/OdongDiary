@@ -1,4 +1,4 @@
-package com.example.owndiary.screen
+package com.example.owndiary.ui.screen
 
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -19,8 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.owndiary.MainActivity
-import com.example.owndiary.components.ImageCard
-import com.example.owndiary.components.TopBar
+import com.example.owndiary.ui.components.ImageCard
+import com.example.owndiary.ui.components.TopBar
 import com.example.owndiary.model.Diary
 import com.example.owndiary.ui.theme.Blue
 import kotlinx.coroutines.CoroutineScope

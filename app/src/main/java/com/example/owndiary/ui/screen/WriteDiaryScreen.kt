@@ -1,4 +1,4 @@
-package com.example.owndiary.screen
+package com.example.owndiary.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,12 +36,13 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun WriteDiaryScreen(
+    index: Int = -1,    //TODO: Room 적용 이후 삭제
     navController: NavController,
     isNew: Boolean,
     diary: Diary? = null,
     onAddDiary: (Diary) -> Unit = {},
-    onRemoveDiary: () -> Unit = {},
-    onEditDiary: (Diary) -> Unit = {},
+    onRemoveDiary: (Diary) -> Unit = {},
+    onEditDiary: (Int, Diary) -> Unit = {index, item ->},
 ) {
     var isEditState by remember { mutableStateOf(isNew) }
     var isImageLoaded by remember { mutableStateOf(!isNew) }
@@ -100,13 +101,17 @@ fun WriteDiaryScreen(
                             )
                         }else{
                             //edit
-                            onEditDiary(
-                                Diary(
-                                    image = diary?.image,
-                                    title = title,
-                                    content = content,
+                            if (diary != null) {
+                                onEditDiary(
+                                    //TODO: Room 적용 이후에는 id 통해 삭제해야 함
+                                    index,
+                                    Diary(
+                                        image = diary?.image,
+                                        title = title,
+                                        content = content,
+                                    )
                                 )
-                            )
+                            }
                         }
                         navController.navigateUp()  //뒤로가기
                     },
@@ -124,7 +129,9 @@ fun WriteDiaryScreen(
                             /*TODO: 이 일기 삭제하기*/
 //                                  id로 삭제하는 쿼리로 수정
 //                                  onRemoveDiary(diary.id)
-                            onRemoveDiary()
+                            if (diary != null) {
+                                onRemoveDiary(diary)
+                            }
                             navController.navigateUp()  //뒤로가기
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = Blue.middle),

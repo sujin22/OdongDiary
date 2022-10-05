@@ -1,4 +1,4 @@
-package com.example.owndiary.components
+package com.example.owndiary.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
