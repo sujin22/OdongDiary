@@ -51,12 +51,8 @@ import java.time.format.DateTimeFormatter
 fun WriteDiaryScreen(
     navController: NavController,
     isNew: Boolean,
-//    viewModel: WriteDiaryViewModel,
     viewModel: WriteDiaryViewModel = hiltViewModel(),
 ) {
-
-    viewModel.getDiaryById()
-
     var isEditState by remember { mutableStateOf(isNew) }
     var isImageLoaded by remember { mutableStateOf(!isNew) }
 
@@ -215,7 +211,7 @@ fun WriteDiaryScreen(
             value = viewModel.titleField,
             onValueChange = { newTitle ->
                 if (!newTitle.contains("\n")) {
-                    viewModel.onTitleChange(newTitle.take(maxChar))
+                    viewModel.titleField = newTitle.take(maxChar)
                 }
                 if (newTitle.length > maxChar) {
                     //maxChar보다 길어졌을 경우 아래로 포커싱 이동
@@ -259,7 +255,7 @@ fun WriteDiaryScreen(
         //Content Area
         BasicTextField(
             value = viewModel.contentField,
-            onValueChange = viewModel::onContentChange,
+            onValueChange = { viewModel.contentField = it },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 10.dp)

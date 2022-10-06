@@ -23,20 +23,20 @@ class WriteDiaryViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
     var diaryId: Int? = null
-        private set
+//        private set
 
     var diary by mutableStateOf<Diary?>(null)
-        private set
+//        private set
 
     var imageUri by mutableStateOf<Uri?>(null)
 
     var imageField by mutableStateOf<Bitmap?>(diary?.image)
 
     var titleField by mutableStateOf(diary?.title ?: "")
-        private set
+//        private set
 
     var contentField by mutableStateOf(diary?.content ?: "")
-        private set
+//        private set
 
     init{
         savedStateHandle.get<String>("index")?.let{ diaryId ->
@@ -56,13 +56,13 @@ class WriteDiaryViewModel @Inject constructor(
         }
     }
 
-    fun onTitleChange(value: String){
-        this.titleField = value
-    }
-
-    fun onContentChange(value: String){
-        this.contentField = value
-    }
+//    fun onTitleChange(value: String){
+//        this.titleField = value
+//    }
+//
+//    fun onContentChange(value: String){
+//        this.contentField = value
+//    }
 
     fun onAddDiary(){
         if(imageField==null || titleField.isBlank()){
