@@ -1,5 +1,7 @@
 package com.example.owndiary.ui.screen
 
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,7 +15,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -33,17 +35,6 @@ fun HomeScreen(
     modalBottomSheetState: ModalBottomSheetState,
     navController: NavController
 ) {
-    //For Gallery
-    val context = LocalContext.current
-    val activity = LocalContext.current as MainActivity
-
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        when (it.resultCode) {
-
-        }
-    }
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(

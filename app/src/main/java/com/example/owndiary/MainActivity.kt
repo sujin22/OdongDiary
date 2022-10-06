@@ -10,7 +10,9 @@ import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -52,30 +54,9 @@ class MainActivity : ComponentActivity() {
         const val PARAM_KEY_REVIEW = "review_content"
         const val PARAM_KEY_RATING = "rating"
     }
-    /*
-    private val imageResult = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()){ result ->
-        if(result.resultCode == RESULT_OK){
-            //이미지를 받으면 ImageView에 적용한다.
-            val imageUri = result.data?.data
-            imageUri?.let{
-                //서버 업로드를 위해 파일 형태로 변환한다.
-                imageFile = File(getRealPathFromURI(it))
-
-                //이미지를 불러온다
-                Glide.with(this)
-                    .load(imageUri)
-                    .fitCenter()
-                    .apply(RequestOptions().override(500,500))
-                    .into(binding.writeReviewLayout.addImageBtn)
-            }
-        }
-    }
-    */
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
         try {
             val field: Field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
@@ -168,7 +149,6 @@ fun OwnDiaryApp(diaryViewModel: DiaryViewModel = viewModel()){
         }
     }
 }
-
 
 private fun setImageBitmap(uri: Uri) {
 //    val bitmap = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){

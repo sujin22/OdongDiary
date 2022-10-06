@@ -3,7 +3,6 @@ package com.example.owndiary.data
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.core.content.res.ResourcesCompat.getDrawable
-import com.example.owndiary.DiaryItem
 import com.example.owndiary.R
 import com.example.owndiary.model.Diary
 
