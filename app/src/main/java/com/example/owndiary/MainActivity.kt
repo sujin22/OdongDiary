@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,31 +36,29 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-//        try {
-//            val field: Field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
-//            field.setAccessible(true)
-//            field.set(null, 100 * 1024 * 1024) //the 100MB is the new size
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
-
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            OwnDiaryTheme{
+            OwnDiaryTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize()
+                        .windowInsetsPadding(
+                            WindowInsets.systemBars.only(
+                                WindowInsetsSides.Vertical
+                            )
+                        ),
                     color = MaterialTheme.colors.background
-                ){
+                ) {
                     OwnDiaryApp()
                 }
             }
+
         }
     }
 }
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun OwnDiaryApp(){
+fun OwnDiaryApp() {
     val navController = rememberNavController()
 
     NavHost(
@@ -73,7 +72,7 @@ fun OwnDiaryApp(){
             WriteDiaryScreen(
                 isNew = true,
                 navController = navController,
-                )
+            )
         }
         composable("detail_diary/{index}") {
             WriteDiaryScreen(

@@ -1,12 +1,14 @@
 package com.example.owndiary.ui.screen
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -24,6 +26,7 @@ import com.example.owndiary.ui.theme.Blue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
@@ -78,7 +81,7 @@ fun HomeScreen(
                         ) {
                             TopBar(coroutineScope, modalBottomSheetState)
                             LazyVerticalGrid(
-                                cells = GridCells.Fixed(2),
+                                columns = GridCells.Fixed(2),
                             ) {
                                 itemsIndexed(notes) { index, item ->
                                     ImageCard(
