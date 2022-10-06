@@ -32,30 +32,17 @@ import java.lang.reflect.Field
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    companion object {
-//        lateinit var bitmapImage: Bitmap
-        const val REVIEW_MIN_LENGTH = 10
 
-        //갤러리 권한 요청
-        const val REQ_GALLERY = 1
-
-        //API 호출시 Paremeter key값
-        const val PARAM_KEY_IMAGE = "image"
-        const val PARAM_KEY_PRODUCT_ID = "product_id"
-        const val PARAM_KEY_REVIEW = "review_content"
-        const val PARAM_KEY_RATING = "rating"
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
-        try {
-            val field: Field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
-            field.setAccessible(true)
-            field.set(null, 100 * 1024 * 1024) //the 100MB is the new size
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+//        try {
+//            val field: Field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
+//            field.setAccessible(true)
+//            field.set(null, 100 * 1024 * 1024) //the 100MB is the new size
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
 
         setContent {
             OwnDiaryTheme{
@@ -63,12 +50,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ){
-                    val homeViewModel: HomeViewModel by viewModels()
-//                    val writeDiaryViewModel: WriteDiaryViewModel by viewModels()
-
-//                    bitmapImage = BitmapFactory.decodeResource(resources, R.drawable.poster)
-//                    OwnDiaryApp(homeViewModel, writeDiaryViewModel)
-                    OwnDiaryApp(homeViewModel)
+                    OwnDiaryApp()
                 }
             }
         }
@@ -76,19 +58,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @SuppressLint("StateFlowValueCalledInComposition")
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun OwnDiaryApp(
-    homeViewModel: HomeViewModel = viewModel(),
-//    writeDiaryViewModel: WriteDiaryViewModel = viewModel(),
-){
-    val diaryList = homeViewModel.diaryList
-    val modalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden
-    )
-    val scaffoldState = rememberScaffoldState()//scaffold state
-    val coroutineScope = rememberCoroutineScope()
-
+fun OwnDiaryApp(){
     val navController = rememberNavController()
 
     NavHost(
@@ -96,51 +67,19 @@ fun OwnDiaryApp(
         startDestination = "home",
     ) {
         composable("home") {
-            ModalBottomSheetLayout(
-                modifier = Modifier.fillMaxHeight(),
-                sheetState = modalBottomSheetState,
-                sheetContent = {
-                    SettingScreen(modalBottomSheetState, coroutineScope)
-                },
-                sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-            ) {
-                Scaffold(
-                    modifier = Modifier.fillMaxHeight(),
-                    scaffoldState = scaffoldState,
-                    content = { padding ->  // We need to pass scaffold's inner padding to content. That's why we use Box.
-                        Box(modifier = Modifier.padding(padding)) {
-                            HomeScreen(
-                                diaryList.value,
-                                coroutineScope, modalBottomSheetState, navController
-                            )
-                        }
-                    }
-                )
-            }
+            HomeScreen(navController = navController)
         }
         composable("new_diary") {
             WriteDiaryScreen(
                 isNew = true,
                 navController = navController,
-//                viewModel = writeDiaryViewModel,
                 )
         }
-        composable("detail_diary/{index}") {backStackEntry ->
-            val indexStr = backStackEntry.arguments?.getString("index") ?:"-1"
-            val index = indexStr.toInt();
-            Log.e("Main_ImageCard_Clicked", "Index is $index")
-
+        composable("detail_diary/{index}") {
             WriteDiaryScreen(
                 isNew = false,
                 navController = navController,
-//                viewModel = writeDiaryViewModel,
             )
-        }
-    }
-
-    BackHandler(enabled = modalBottomSheetState.isVisible) {
-        coroutineScope.launch {
-            modalBottomSheetState.hide()
         }
     }
 }
