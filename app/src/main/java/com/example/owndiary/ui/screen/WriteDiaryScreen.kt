@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import com.example.owndiary.MainActivity
 import com.example.owndiary.R
 import com.example.owndiary.model.Diary
+import com.example.owndiary.model.cropCenterBitmap
 import com.example.owndiary.ui.theme.Blue
 import com.example.owndiary.ui.theme.DarkGray
 import com.example.owndiary.ui.theme.LightGray
@@ -47,7 +48,6 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun WriteDiaryScreen(
-    index: Int = -1,    //TODO: Room 적용 이후 삭제
     navController: NavController,
     isNew: Boolean,
     diary: Diary? = null,
@@ -74,7 +74,7 @@ fun WriteDiaryScreen(
         mutableStateOf<Uri?>(null)
     }
     var bitmap = remember{
-        mutableStateOf<Bitmap?>(null)
+        mutableStateOf<Bitmap?>(diary?.image)
     }
 
     val takePhotoFromAlbumLauncher =
@@ -123,13 +123,11 @@ fun WriteDiaryScreen(
                                 //add
                                 onAddDiary(
                                     Diary(
-                                        //TODO: 갤러리에서 불러온 image 넣어야 함
-                                        image = Bitmap.createScaledBitmap(
-                                            MainActivity.bitmapImage,
-                                            400,
-                                            300,
-                                            true
-                                        ),
+                                        image = bitmap.value?.let {
+                                            cropCenterBitmap(it, 400, 300)?.let { it1 ->
+                                                Bitmap.createScaledBitmap(it1, 1000, 750, true)
+                                            }
+                                          },
                                         title = title,
                                         content = content,
                                     )
@@ -187,9 +185,9 @@ fun WriteDiaryScreen(
             if (isImageLoaded) {
                 bitmap.value?.let{bitmap ->
                     Image(
-                        bitmap = bitmap.asImageBitmap(),
                         contentDescription = "image",
                         contentScale = ContentScale.Crop,
+                        bitmap = bitmap.asImageBitmap(),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(250.dp)

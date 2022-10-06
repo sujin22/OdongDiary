@@ -16,10 +16,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.owndiary.MainActivity
 import com.example.owndiary.R
 import com.example.owndiary.model.Diary
 import com.example.owndiary.ui.theme.Blue
@@ -60,11 +62,13 @@ fun ImageCard(
                 contentAlignment = Alignment.Center
             ) {
                 //Image area
-                Image(
-                    painterResource(id = R.drawable.poster),
-                    contentDescription = "image",
-                    contentScale = ContentScale.Crop,
-                )
+                diary.image?.let {
+                    Image(
+                        contentDescription = "image",
+                        contentScale = ContentScale.Crop,
+                        bitmap = it.asImageBitmap(),
+                    )
+                }
                 //Favorite area
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -99,7 +103,7 @@ fun ImageCard(
 
             //Content Area
             Text(
-                text = diary.content,
+                text = diary.content+"\n".repeat(2),
                 fontSize = 12.sp,
                 maxLines = 2,
             )

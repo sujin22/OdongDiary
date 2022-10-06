@@ -133,7 +133,6 @@ fun OwnDiaryApp(diaryViewModel: DiaryViewModel = viewModel()){
             Log.e("ImageCard_Clicked", "Index is $index")
 
             WriteDiaryScreen(
-                index = index,
                 diary = diaryList.value[index],
                 onRemoveDiary = diaryViewModel::removeDiary,
                 onEditDiary = diaryViewModel::updateDiary,
