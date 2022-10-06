@@ -53,6 +53,7 @@ import com.example.owndiary.ui.theme.DarkGray
 import com.example.owndiary.ui.theme.LightGray
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun WriteDiaryScreen(
     navController: NavController,
@@ -152,11 +153,9 @@ fun WriteDiaryScreen(
             }
         }
         Column(
-            modifier =
-                if (!isEditState)
-                    Modifier.verticalScroll(rememberScrollState())
-                else
-                    Modifier,
+            modifier = Modifier
+                        .verticalScroll(rememberScrollState(), reverseScrolling = true)
+                        .imePadding()
         ) {
             //Image area
             if (isImageLoaded) {
