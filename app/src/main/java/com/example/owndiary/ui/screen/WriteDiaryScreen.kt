@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -50,263 +51,232 @@ import java.time.format.DateTimeFormatter
 fun WriteDiaryScreen(
     navController: NavController,
     isNew: Boolean,
-    diary: Diary? = null,
-    onAddDiary: (Diary) -> Unit = {},
-    onRemoveDiary: (Diary) -> Unit = {},
-    onEditDiary: (Diary) -> Unit = {},
+//    viewModel: WriteDiaryViewModel,
+    viewModel: WriteDiaryViewModel = hiltViewModel(),
 ) {
+
+    viewModel.getDiaryById()
+
     var isEditState by remember { mutableStateOf(isNew) }
     var isImageLoaded by remember { mutableStateOf(!isNew) }
-    val focusManager = LocalFocusManager.current
 
-    val (title, setTitle) = remember {
-        mutableStateOf(diary?.title ?: "")
-    }
-    val (content, setContent) = remember {
-        mutableStateOf(diary?.content ?: "")
-    }
+    val focusManager = LocalFocusManager.current
 
     //For Gallery
     val context = LocalContext.current
-    val activity = LocalContext.current as MainActivity
-
-    var imageUri by remember {
-        mutableStateOf<Uri?>(null)
-    }
-    var bitmap = remember{
-        mutableStateOf<Bitmap?>(diary?.image)
-    }
 
     val takePhotoFromAlbumLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-            imageUri = uri
+            viewModel.imageUri = uri
         }
 
-        Column(
-            Modifier
-                .fillMaxSize()
-                .background(Blue.light)
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        focusManager.clearFocus()
-                    })
-                }
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.Start,
-        )
-        {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(Blue.light)
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            }
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.Start,
+    )
+    {
 
-            //bar area
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+        //bar area
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            IconButton(
+                modifier = Modifier
+                    .wrapContentWidth(),
+                onClick = {
+                    navController.navigateUp()  //뒤로가기
+                },
             ) {
-                IconButton(
-                    modifier = Modifier
-                        .wrapContentWidth(),
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "back",
+                    tint = Blue.heavy,
+                )
+            }
+            if (isEditState) {
+                Button(
+                    modifier = Modifier.padding(horizontal = 5.dp),
                     onClick = {
+                        //HomeScreen 리스트에 내용 저장하기
+                        if (isNew) {
+                            //add
+                            viewModel.onAddDiary()
+                        } else {
+                            //edit
+                            viewModel.onEditDiary()
+                        }
                         navController.navigateUp()  //뒤로가기
                     },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Blue.heavy)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "back",
-                        tint = Blue.heavy,
-                    )
+                    Text("완료")
                 }
-                if (isEditState) {
+
+            } else {
+                Row {
+                    //삭제 버튼
+                    Button(
+                        modifier = Modifier
+                            .width(40.dp),
+                        onClick = {
+                            viewModel.onRemoveDiary()
+                            navController.navigateUp()
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Blue.middle),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DeleteOutline,
+                            contentDescription = "back",
+                            tint = Color.Black,
+                        )
+                    }
+                    //편집 버튼
                     Button(
                         modifier = Modifier.padding(horizontal = 5.dp),
                         onClick = {
-                            //HomeScreen 리스트에 내용 저장하기
-                            if (isNew) {
-                                //add
-                                onAddDiary(
-                                    Diary(
-                                        image = bitmap.value?.let {
-                                            cropCenterBitmap(it, 400, 300)?.let { it1 ->
-                                                Bitmap.createScaledBitmap(it1, 1000, 750, true)
-                                            }
-                                          },
-                                        title = title,
-                                        content = content,
-                                    )
-                                )
-                            } else {
-                                //edit
-                                if (diary != null) {
-                                    Log.d("UPDATE_DIARY", "id(Screen): ${diary.id}")
-                                    diary.title = title
-                                    diary.content = content
-                                    onEditDiary(diary)
-                                }
-                            }
-                            navController.navigateUp()  //뒤로가기
+                            isEditState = true
                         },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Blue.heavy)
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Blue.middle)
                     ) {
-                        Text("완료")
-                    }
-
-                } else {
-                    Row {
-                        Button(
-                            modifier = Modifier
-                                .width(40.dp),
-                            onClick = {
-                                if (diary != null) {
-                                    onRemoveDiary(diary)
-                                }
-                                navController.navigateUp()  //뒤로가기
-                            },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Blue.middle),
-                            contentPadding = PaddingValues(0.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.DeleteOutline,
-                                contentDescription = "back",
-                                tint = Color.Black,
-                            )
-                        }
-                        Button(
-                            modifier = Modifier.padding(horizontal = 5.dp),
-                            onClick = {
-                                isEditState = true
-                            },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Blue.middle)
-                        ) {
-                            Text("편집")
-                        }
+                        Text("편집")
                     }
                 }
             }
+        }
 
-            //Image area
-            if (isImageLoaded) {
-                bitmap.value?.let{bitmap ->
-                    Image(
-                        contentDescription = "image",
-                        contentScale = ContentScale.Crop,
-                        bitmap = bitmap.asImageBitmap(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(250.dp)
-                            .padding(10.dp),
-                    )
-                }
-            } else {
-                Button(
+        //Image area
+        if (isImageLoaded) {
+            viewModel.imageField?.let { bitmap ->
+                Image(
+                    contentDescription = "image",
+                    contentScale = ContentScale.Crop,
+                    bitmap = bitmap.asImageBitmap(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(250.dp)
                         .padding(10.dp),
-                    onClick = {
-                        takePhotoFromAlbumLauncher.launch("image/*")
-                        focusManager.clearFocus()
-                    },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = LightGray)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "load",
-                        tint = Blue.heavy,
-                        modifier = Modifier.size(50.dp)
-                    )
-                }
-                imageUri?.let{
-                    val source = ImageDecoder
-                        .createSource(context.contentResolver, it)
-                    bitmap.value = ImageDecoder.decodeBitmap(source)
-                    isImageLoaded = true
-                }
-            }
-
-            //Date Area
-            diary?.date?.let {
-                Text(
-                    text = it.format(DateTimeFormatter.ofPattern("yyyy.MM.dd EEE")),
-                    color = Color.Black,
-                    fontSize = 17.sp,
-                    modifier = Modifier
-                        .padding(start = 10.dp, bottom = 10.dp),
                 )
             }
-
-            //Title Area
-            val maxChar = 15
-
-            BasicTextField(
+        } else {
+            Button(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp),
-                value = title,
-                onValueChange = { newTitle ->
-                    if (!newTitle.contains("\n")) {
-                        setTitle(newTitle.take(maxChar))
-                    }
-                    if (newTitle.length > maxChar) {
-                        //maxChar보다 길어졌을 경우 아래로 포커싱 이동
-                        //(maxChar 처리를 해주지 않으면, TextField가 empty하게 초기화되는 에러 발생함)
-                        // -> predictive text 때문인 것으로 추정됨
-                        focusManager.moveFocus(FocusDirection.Down)
-                    }
+                    .height(250.dp)
+                    .padding(10.dp),
+                onClick = {
+                    takePhotoFromAlbumLauncher.launch("image/*")
+                    focusManager.clearFocus()
                 },
-                textStyle = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                ),
-                singleLine = true,
-                maxLines = 1,
-                decorationBox = { innerTextField ->
-                    if (title.isEmpty()) {
-                        Text(
-                            text = "제목을 입력하세요.",
-                            color = DarkGray,
-                            fontSize = 20.sp
-                        )
-                    }
-                    innerTextField()
-                },
-                enabled = isEditState,
-            )
+                colors = ButtonDefaults.buttonColors(backgroundColor = LightGray)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "load",
+                    tint = Blue.heavy,
+                    modifier = Modifier.size(50.dp)
+                )
+            }
+            viewModel.imageUri?.let {
+                val source = ImageDecoder
+                    .createSource(context.contentResolver, it)
+                viewModel.imageField = ImageDecoder.decodeBitmap(source)
+                isImageLoaded = true
+            }
+        }
+
+        //Date Area
+        viewModel.diary?.date?.let {
             Text(
-                text = "(${title.length}/$maxChar)",
+                text = it.format(DateTimeFormatter.ofPattern("yyyy.MM.dd EEE")),
+                color = Color.Black,
+                fontSize = 17.sp,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 10.dp, bottom = 10.dp),
-                textAlign = TextAlign.End,
-            )
-
-            Divider(
-                color = Blue.middle,
-                thickness = 1.dp,
-                modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-            )
-
-            //Content Area
-            BasicTextField(
-                value = content,
-                onValueChange = setContent,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 10.dp)
-                    .verticalScroll(rememberScrollState())
-                    .weight(1f)
-                ,
-                textStyle = TextStyle(fontSize = 15.sp),
-                decorationBox = { innerTextField ->
-                    if (content.isEmpty()) {
-                        Text(
-                            text = "내용을 입력하세요",
-                            color = DarkGray,
-                            fontSize = 15.sp,
-                        )
-                    }
-                    innerTextField()
-                },
-                enabled = isEditState,
+                    .padding(start = 10.dp, bottom = 10.dp),
             )
         }
-    }
 
-//}
+        //Title Area
+        val maxChar = 15
+
+        BasicTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp),
+            value = viewModel.titleField,
+            onValueChange = { newTitle ->
+                if (!newTitle.contains("\n")) {
+                    viewModel.onTitleChange(newTitle.take(maxChar))
+                }
+                if (newTitle.length > maxChar) {
+                    //maxChar보다 길어졌을 경우 아래로 포커싱 이동
+                    //(maxChar 처리를 해주지 않으면, TextField가 empty하게 초기화되는 에러 발생함)
+                    // -> predictive text 때문인 것으로 추정됨
+                    focusManager.moveFocus(FocusDirection.Down)
+                }
+            },
+            textStyle = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            ),
+            singleLine = true,
+            maxLines = 1,
+            decorationBox = { innerTextField ->
+                if (viewModel.titleField.isEmpty()) {
+                    Text(
+                        text = "제목을 입력하세요.",
+                        color = DarkGray,
+                        fontSize = 20.sp
+                    )
+                }
+                innerTextField()
+            },
+            enabled = isEditState,
+        )
+        Text(
+            text = "(${viewModel.titleField.length}/$maxChar)",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp, bottom = 10.dp),
+            textAlign = TextAlign.End,
+        )
+
+        Divider(
+            color = Blue.middle,
+            thickness = 1.dp,
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+        )
+
+        //Content Area
+        BasicTextField(
+            value = viewModel.contentField,
+            onValueChange = viewModel::onContentChange,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 10.dp)
+                .verticalScroll(rememberScrollState())
+                .weight(1f),
+            textStyle = TextStyle(fontSize = 15.sp),
+            decorationBox = { innerTextField ->
+                if (viewModel.contentField.isEmpty()) {
+                    Text(
+                        text = "내용을 입력하세요",
+                        color = DarkGray,
+                        fontSize = 15.sp,
+                    )
+                }
+                innerTextField()
+            },
+            enabled = isEditState,
+        )
+    }
+}

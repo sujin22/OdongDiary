@@ -66,8 +66,8 @@ fun HomeScreen(
                     ImageCard(
                         diary = item,
                         onDiaryClicked = {
-                            Log.e("ImageCard_Clicked", "Yes It Click $index")
-                            navController.navigate("detail_diary/$index")
+                            Log.e("ImageCard_Clicked", "Yes It Click ${item.id}")
+                            navController.navigate("detail_diary/${item.id}")
                         }
                     )
                 }

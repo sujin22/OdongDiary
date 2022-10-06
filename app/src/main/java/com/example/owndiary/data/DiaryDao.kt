@@ -10,6 +10,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DiaryDao {
+
+    @Query("" +
+            "SELECT * FROM diary_table " +
+            "WHERE id = :id")
+    suspend fun getDiaryById(id: Int): Diary
+
     @Insert
     suspend fun insert(diary: Diary)
 

@@ -10,11 +10,12 @@ import javax.inject.Inject
 
 
 class DiaryRepository @Inject constructor(private val diaryDao: DiaryDao){
+    fun getAllDiary() : Flow<List<Diary>> =
+        diaryDao.getAll().flowOn(Dispatchers.IO).conflate()
+
+    suspend fun getDiaryById(id: Int): Diary? = diaryDao.getDiaryById(id)
     suspend fun addDiary(diary: Diary) = diaryDao.insert(diary)
     suspend fun updateDiary(diary: Diary) = diaryDao.update(diary)
     suspend fun deleteDiary(diary: Diary) = diaryDao.delete(diary)
     suspend fun deleteAllDiary() = diaryDao.deleteAll()
-
-    fun getAllDiary() : Flow<List<Diary>> =
-        diaryDao.getAll().flowOn(Dispatchers.IO).conflate()
 }
