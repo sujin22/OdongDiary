@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.owndiary.ui.components.PaletteCard
 import com.example.owndiary.ui.theme.Blue
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +21,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SettingScreen(modalBottomSheetState: ModalBottomSheetState, coroutineScope: CoroutineScope) {
+fun SettingScreen(
+    modalBottomSheetState: ModalBottomSheetState,
+    coroutineScope: CoroutineScope,
+    viewModel: SettingViewModel = hiltViewModel()
+) {
     val (text, setValue) = remember {
         mutableStateOf("")
     }
@@ -110,7 +115,11 @@ fun SettingScreen(modalBottomSheetState: ModalBottomSheetState, coroutineScope: 
                     .padding(horizontal = 30.dp),
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
-                    /*TODO: 일기장 초기화 클릭 시 동작*/
+                    /*TODO: Dialog*/
+                    viewModel.onRemoveAllDiary()
+                    coroutineScope.launch {
+                        modalBottomSheetState.hide()
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Blue.light)
             ) {
