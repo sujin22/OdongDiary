@@ -48,7 +48,6 @@ import com.example.owndiary.MainActivity
 import com.example.owndiary.R
 import com.example.owndiary.model.Diary
 import com.example.owndiary.model.cropCenterBitmap
-import com.example.owndiary.ui.theme.Blue
 import com.example.owndiary.ui.theme.DarkGray
 import com.example.owndiary.ui.theme.LightGray
 import java.time.format.DateTimeFormatter
@@ -76,7 +75,7 @@ fun WriteDiaryScreen(
     Column(
         Modifier
             .fillMaxSize()
-            .background(Blue.light)
+            .background(viewModel.themeColor.light)
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     focusManager.clearFocus()
@@ -99,7 +98,7 @@ fun WriteDiaryScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "back",
-                    tint = Blue.heavy,
+                    tint = viewModel.themeColor.heavy,
                 )
             }
             if (isEditState) {
@@ -116,7 +115,7 @@ fun WriteDiaryScreen(
                         }
                         navController.navigateUp()  //뒤로가기
                     },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Blue.heavy)
+                    colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.themeColor.heavy)
                 ) {
                     Text("완료")
                 }
@@ -131,7 +130,7 @@ fun WriteDiaryScreen(
                             viewModel.onRemoveDiary()
                             navController.navigateUp()
                         },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Blue.middle),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.themeColor.middle),
                         contentPadding = PaddingValues(0.dp)
                     ) {
                         Icon(
@@ -146,7 +145,7 @@ fun WriteDiaryScreen(
                         onClick = {
                             isEditState = true
                         },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Blue.middle)
+                        colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.themeColor.middle)
                     ) {
                         Text("편집")
                     }
@@ -186,7 +185,7 @@ fun WriteDiaryScreen(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "load",
-                        tint = Blue.heavy,
+                        tint = viewModel.themeColor.heavy,
                         modifier = Modifier.size(50.dp)
                     )
                 }
@@ -257,7 +256,7 @@ fun WriteDiaryScreen(
             }
 
             Divider(
-                color = Blue.middle,
+                color = viewModel.themeColor.middle,
                 thickness = 1.dp,
                 modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
             )

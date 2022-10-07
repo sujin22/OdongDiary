@@ -29,7 +29,7 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val notes = viewModel.diaryList.collectAsState(
+    val diaryList = viewModel.diaryList.collectAsState(
         initial = emptyList()
     ).value
 
@@ -80,7 +80,7 @@ fun HomeScreen(
                             LazyVerticalGrid(
                                 columns = GridCells.Fixed(2),
                             ) {
-                                itemsIndexed(notes) { index, item ->
+                                itemsIndexed(diaryList) { index, item ->
                                     ImageCard(
                                         backgroundColor = viewModel.themeColor.middle,
                                         diary = item

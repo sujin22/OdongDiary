@@ -22,16 +22,15 @@ class WriteDiaryViewModel @Inject constructor(
     private val repository: DiaryRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
-    var diaryId: Int? = null
+    var themeColor by mutableStateOf(repository.getThemeColor())
 
+    var diaryId: Int? = null
     var diary by mutableStateOf<Diary?>(null)
 
     var imageUri by mutableStateOf<Uri?>(null)
 
     var imageField by mutableStateOf<Bitmap?>(diary?.image)
-
     var titleField by mutableStateOf(diary?.title ?: "")
-
     var contentField by mutableStateOf(diary?.content ?: "")
 
     init{
