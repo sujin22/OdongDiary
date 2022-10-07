@@ -1,4 +1,4 @@
-package com.example.owndiary.data
+package com.example.owndiary.database
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -8,7 +8,6 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoField
 import java.util.*
 
 class RoomTypeConverter {

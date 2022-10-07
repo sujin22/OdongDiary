@@ -23,20 +23,16 @@ class WriteDiaryViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel(){
     var diaryId: Int? = null
-//        private set
 
     var diary by mutableStateOf<Diary?>(null)
-//        private set
 
     var imageUri by mutableStateOf<Uri?>(null)
 
     var imageField by mutableStateOf<Bitmap?>(diary?.image)
 
     var titleField by mutableStateOf(diary?.title ?: "")
-//        private set
 
     var contentField by mutableStateOf(diary?.content ?: "")
-//        private set
 
     init{
         savedStateHandle.get<String>("index")?.let{ diaryId ->
@@ -56,14 +52,7 @@ class WriteDiaryViewModel @Inject constructor(
         }
     }
 
-//    fun onTitleChange(value: String){
-//        this.titleField = value
-//    }
-//
-//    fun onContentChange(value: String){
-//        this.contentField = value
-//    }
-
+    //새로운 다이어리 삽입 시 호출되는 메소드
     fun onAddDiary(){
         if(imageField==null || titleField.isBlank()){
             return
@@ -83,6 +72,7 @@ class WriteDiaryViewModel @Inject constructor(
         }
     }
 
+    //다이어리 수정 시 호출되는 메소드
     fun onEditDiary(){
         diary?.title = titleField
         diary?.content = contentField
@@ -97,6 +87,7 @@ class WriteDiaryViewModel @Inject constructor(
         }
     }
 
+    //다이어리 삭제 시 호출되는 메소드
     fun onRemoveDiary() = viewModelScope.launch {
         diary?.let {
             repository.deleteDiary(it)

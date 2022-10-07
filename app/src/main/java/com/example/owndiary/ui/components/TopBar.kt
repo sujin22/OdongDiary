@@ -16,7 +16,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TopBar(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBottomSheetState) {
+fun TopBar(
+    pointColor: Color,
+    title: String,
+    coroutineScope: CoroutineScope,
+    modalBottomSheetState: ModalBottomSheetState) {
     var isDropDownMenuExpended by remember {
         mutableStateOf(false)
     }
@@ -31,7 +35,7 @@ fun TopBar(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBottomShe
                 Icon(
                     imageVector = Icons.Default.Sort,
                     contentDescription = "menu",
-                    tint = Color.Black,
+                    tint = pointColor,
                 )
             }
             DropdownMenu(
@@ -63,7 +67,7 @@ fun TopBar(coroutineScope: CoroutineScope, modalBottomSheetState: ModalBottomShe
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "setting",
-                tint = Color.Black,
+                tint = pointColor,
             )
         }
     }

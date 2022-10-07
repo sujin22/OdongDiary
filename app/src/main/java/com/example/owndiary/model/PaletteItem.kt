@@ -1,4 +1,4 @@
-package com.example.owndiary.ui.theme
+package com.example.owndiary.model
 
 import androidx.compose.ui.graphics.Color
 

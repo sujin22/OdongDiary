@@ -1,4 +1,4 @@
-package com.example.owndiary.data
+package com.example.owndiary.database
 
 import androidx.room.Dao
 import androidx.room.Delete

@@ -3,13 +3,11 @@ package com.example.owndiary.ui.screen
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -22,12 +20,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.owndiary.ui.components.ImageCard
 import com.example.owndiary.ui.components.TopBar
-import com.example.owndiary.ui.theme.Blue
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -59,7 +55,7 @@ fun HomeScreen(
                     Scaffold(
                         floatingActionButton = {
                             FloatingActionButton(
-                                backgroundColor = Blue.heavy,
+                                backgroundColor = viewModel.themeColor.heavy,
                                 onClick = {
                                     navController.navigate("new_diary")
                                 }
@@ -77,20 +73,21 @@ fun HomeScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(color = Blue.light)
+                                .background(color = viewModel.themeColor.light)
                         ) {
-                            TopBar(coroutineScope, modalBottomSheetState)
+                            TopBar(viewModel.themeColor.heavy, viewModel.diaryName,
+                                coroutineScope, modalBottomSheetState)
                             LazyVerticalGrid(
                                 columns = GridCells.Fixed(2),
                             ) {
                                 itemsIndexed(notes) { index, item ->
                                     ImageCard(
-                                        diary = item,
-                                        onDiaryClicked = {
-                                            Log.e("ImageCard_Clicked", "${item.id} Clicked")
-                                            navController.navigate("detail_diary/${item.id}")
-                                        }
-                                    )
+                                        backgroundColor = viewModel.themeColor.middle,
+                                        diary = item
+                                    ) {
+                                        Log.e("ImageCard_Clicked", "${item.id} Clicked")
+                                        navController.navigate("detail_diary/${item.id}")
+                                    }
                                 }
                             }
 

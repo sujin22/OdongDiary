@@ -18,18 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.owndiary.MainActivity
-import com.example.owndiary.R
 import com.example.owndiary.model.Diary
-import com.example.owndiary.ui.theme.Blue
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ImageCard(
+    backgroundColor: Color,
     diary: Diary,
     onDiaryClicked:() -> Unit,
 ) {
@@ -47,7 +44,7 @@ fun ImageCard(
             .clickable {},
         shape = RoundedCornerShape(8.dp),
         elevation = 5.dp,
-        backgroundColor = Blue.middle,
+        backgroundColor = backgroundColor,
         onClick = {
             onDiaryClicked()
         }

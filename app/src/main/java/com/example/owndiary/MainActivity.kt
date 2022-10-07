@@ -1,6 +1,7 @@
 package com.example.owndiary
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.database.CursorWindow
 import android.net.Uri
 import android.os.Bundle
@@ -26,6 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.owndiary.ui.screen.*
 import com.example.owndiary.ui.theme.*
+import com.google.gson.GsonBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.lang.reflect.Field
@@ -36,6 +38,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             OwnDiaryTheme {

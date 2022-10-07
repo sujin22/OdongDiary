@@ -1,6 +1,7 @@
 package com.example.owndiary.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import com.example.owndiary.model.PaletteItem
 
 val Purple200 = Color(0xFFBB86FC)
 val Purple500 = Color(0xFF6200EE)
@@ -49,14 +50,15 @@ val Red = PaletteItem(
 
 //Green
 val Green = PaletteItem(
-    Color(0xFFF6FFCC),
-    Color(0xFFE4F7BA),
-    Color(0xFFD2E5A8)
+    Color(0xFFd9ead3),
+    Color(0xFFb6d7a8),
+    Color(0xFF93c47d)
+//    Color(0xFF88a376)
 )
 
 //Navy
 val Navy = PaletteItem(
-    Color(0xFFEBF7FF),
-    Color(0xFFC7D3ED),
+    Color(0xFFD9E5FF),
+    Color(0xFF5587ED),
     Color(0xFF3669CF)
 )

@@ -72,6 +72,7 @@ fun WriteDiaryScreen(
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
             viewModel.imageUri = uri
         }
+
     Column(
         Modifier
             .fillMaxSize()
