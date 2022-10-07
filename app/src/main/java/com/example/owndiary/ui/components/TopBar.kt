@@ -56,7 +56,7 @@ fun TopBar(
             }
         }
         Text(
-            text = "Own Diary",
+            text = title,
             fontSize = 25.sp,
         )
         IconButton(onClick = {

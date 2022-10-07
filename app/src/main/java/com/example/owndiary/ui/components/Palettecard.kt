@@ -13,14 +13,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.owndiary.model.PaletteItem
 import com.example.owndiary.ui.theme.*
 
 @Composable
-fun PaletteCard() {
+fun PaletteCard(
+    onClickItem: (PaletteItem) -> Unit,
+) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
     ) {
         itemsIndexed(
             listOf(
@@ -32,7 +35,7 @@ fun PaletteCard() {
                     .size(40.dp, 40.dp)
                     .padding(5.dp, 5.dp),
                 onClick = {
-                    /*TODO: color 클릭 시 동작*/
+                    onClickItem(item)
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = item.heavy),
                 shape = RoundedCornerShape(8.dp),

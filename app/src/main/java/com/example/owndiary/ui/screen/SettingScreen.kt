@@ -7,15 +7,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.owndiary.ui.components.PaletteCard
-import com.example.owndiary.ui.theme.Blue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -24,11 +21,8 @@ import kotlinx.coroutines.launch
 fun SettingScreen(
     modalBottomSheetState: ModalBottomSheetState,
     coroutineScope: CoroutineScope,
-    viewModel: SettingViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val (text, setValue) = remember {
-        mutableStateOf("")
-    }
     Surface(
         modifier = Modifier
             .fillMaxHeight(0.9f)
@@ -36,7 +30,7 @@ fun SettingScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Blue.middle),
+                .background(viewModel.settingThemeColor.middle),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(10.dp))
@@ -48,11 +42,12 @@ fun SettingScreen(
                     .align(Alignment.End)
                     .padding(end = 30.dp),
                 onClick = {
+                    viewModel.onClickApply()
                     coroutineScope.launch {
                         modalBottomSheetState.hide()
                     }
                 },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Blue.heavy),
+                colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.settingThemeColor.heavy),
                 shape = RoundedCornerShape(8.dp),
             ) {
                 Text(
@@ -67,7 +62,7 @@ fun SettingScreen(
                     .padding(horizontal = 30.dp)
                     .wrapContentHeight(Alignment.CenterVertically),
                 shape = RoundedCornerShape(8.dp),
-                backgroundColor = Blue.light
+                backgroundColor = viewModel.settingThemeColor.light
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
                     Text("Diary Name")
@@ -81,8 +76,10 @@ fun SettingScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         BasicTextField(
-                            value = text,
-                            onValueChange = setValue,
+                            value = viewModel.settingDiaryName,
+                            onValueChange = {
+                                viewModel.settingDiaryName = it
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                         )
@@ -97,12 +94,16 @@ fun SettingScreen(
                     .padding(horizontal = 30.dp)
                     .wrapContentHeight(Alignment.CenterVertically),
                 shape = RoundedCornerShape(8.dp),
-                backgroundColor = Blue.light
+                backgroundColor = viewModel.settingThemeColor.light
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
                     Text("Color")
                     Spacer(Modifier.height(10.dp))
-                    PaletteCard()
+                    PaletteCard(
+                        onClickItem = { item ->
+                            viewModel.onClickPaletteItem(item)
+                        }
+                    )
                     Spacer(Modifier.height(8.dp))
                 }
             }
@@ -115,13 +116,13 @@ fun SettingScreen(
                     .padding(horizontal = 30.dp),
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
-                    /*TODO: Dialog*/
+                    /*TODO: Dialog로 더블 체크*/
                     viewModel.onRemoveAllDiary()
                     coroutineScope.launch {
                         modalBottomSheetState.hide()
                     }
                 },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Blue.light)
+                colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.settingThemeColor.light)
             ) {
                 Text(
                     text = "일기장 초기화",

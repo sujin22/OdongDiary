@@ -1,13 +1,16 @@
 package com.example.owndiary.repository
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.owndiary.OwnDiaryApplication.Companion.sharedPreferences
 import com.example.owndiary.database.DiaryDao
 import com.example.owndiary.model.Diary
 import com.example.owndiary.model.PaletteItem
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
+import java.io.IOException
 import javax.inject.Inject
 
 
@@ -28,4 +31,19 @@ class DiaryRepository @Inject constructor(private val diaryDao: DiaryDao){
 
     fun setDiaryName(name: String) = sharedPreferences.setDiaryName(name)
     fun setThemeColor(item: PaletteItem) = sharedPreferences.setThemeColor(item)
+
+    //Data Store
+//    val settingPrefStoreFlow: Flow<SettingItem> = dataStore.data
+//        .map { preferences ->
+//            // Get our show completed value, defaulting to false if not set:
+//            val diaryName = preferences.diaryName
+//            val themeColor = preferences.themeColor
+//            SettingItem(diaryName, themeColor)
+//        }
+//    suspend fun updateShowCompleted(diaryName: String) {
+//        dataStore.edit { preferences ->
+//            preferences[PreferencesKeys.SHOW_COMPLETED] = showCompleted
+//        }
+//    }
+//    data class SettingItem(val diaryName: String, val themeColor: PaletteItem)
 }

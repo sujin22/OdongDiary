@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DiaryDao {
-
     @Query("" +
             "SELECT * FROM diary_table " +
             "WHERE id = :id")
