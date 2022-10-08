@@ -44,9 +44,8 @@ class HomeViewModel @Inject constructor(
         themeColor = settingThemeColor
     }
     fun onTapFavorite(diary: Diary){
-        diary.isFavorite = !diary.isFavorite
         viewModelScope.launch{
-            diary?.let { repository.updateDiary(it) }
+            repository.updateDiary(diary)
         }
     }
 }

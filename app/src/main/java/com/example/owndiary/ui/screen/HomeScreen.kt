@@ -36,7 +36,7 @@ fun HomeScreen(
 ) {
     var sortState by remember { mutableStateOf(Sort.DESCENDING) }
 
-    var diaryList = viewModel.diaryList.collectAsState(initial = emptyList())
+    val diaryList = viewModel.diaryList.collectAsState(initial = emptyList())
         .value
         .filter{
             if(sortState == Sort.FAVORITES)
@@ -120,7 +120,8 @@ fun HomeScreen(
                                             Log.e("ImageCard_Clicked", "${item.id} Clicked")
                                             navController.navigate("detail_diary/${item.id}")
                                         },
-                                        onTabFavorite = {
+                                        onTabFavorite = { isFavorite ->
+                                            item.isFavorite = isFavorite
                                             viewModel.onTapFavorite(item)
                                         }
                                     )

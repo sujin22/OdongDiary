@@ -1,5 +1,6 @@
 package com.example.owndiary.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -12,11 +13,8 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,17 +26,17 @@ import androidx.compose.ui.unit.sp
 import com.example.owndiary.model.Diary
 import java.time.format.DateTimeFormatter
 
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ImageCard(
     backgroundColor: Color,
     diary: Diary,
     onDiaryClicked:() -> Unit,
-    onTabFavorite: () -> Unit,
+    onTabFavorite: (Boolean) -> Unit,
 ) {
-    var isFavorite by rememberSaveable {
-        mutableStateOf(diary.isFavorite)
-    }
+    var isFavorite by mutableStateOf(diary.isFavorite)
+
     Card(
         modifier = Modifier
             .fillMaxWidth(0.5f)
@@ -77,7 +75,7 @@ fun ImageCard(
                     IconButton(
                         onClick = {
                         isFavorite = !isFavorite
-                        onTabFavorite()
+                        onTabFavorite(isFavorite)
                     }) {
                         Icon(
                             Icons.Outlined.FavoriteBorder, contentDescription = "favorite_shadow",
