@@ -20,7 +20,11 @@ fun TopBar(
     pointColor: Color,
     title: String,
     coroutineScope: CoroutineScope,
-    modalBottomSheetState: ModalBottomSheetState) {
+    modalBottomSheetState: ModalBottomSheetState,
+    onTapAscendingSort: () -> Unit,
+    onTapDescendingSort: () -> Unit,
+    onTapFavoritesSort: () -> Unit
+) {
     var isDropDownMenuExpended by remember {
         mutableStateOf(false)
     }
@@ -44,13 +48,19 @@ fun TopBar(
                 onDismissRequest = {
                     isDropDownMenuExpended = false
                 }) {
-                DropdownMenuItem(onClick = { /*TODO*/ }) {
+                DropdownMenuItem(onClick = {
+                    onTapAscendingSort()
+                }) {
                     Text("날짜 오름차순")
                 }
-                DropdownMenuItem(onClick = { /*TODO*/ }) {
+                DropdownMenuItem(onClick = {
+                    onTapDescendingSort()
+                }) {
                     Text("날짜 내림차순")
                 }
-                DropdownMenuItem(onClick = { /*TODO*/ }) {
+                DropdownMenuItem(onClick = {
+                    onTapFavoritesSort()
+                }) {
                     Text("Favorites")
                 }
             }

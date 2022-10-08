@@ -30,10 +30,4 @@ interface DiaryDao {
 
     @Query("DELETE FROM diary_table")
     suspend fun deleteAll()
-
-    /*TODO
-    * - 날짜 오름차순, 내림차순 정렬 반환 쿼리
-    * - favorite인 Data만 가져오는 쿼리
-    * */
-
 }

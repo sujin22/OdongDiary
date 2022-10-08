@@ -18,10 +18,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.owndiary.model.Diary
 import com.example.owndiary.ui.components.ImageCard
 import com.example.owndiary.ui.components.TopBar
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
+enum class Sort{
+    DESCENDING, ASCENDING, FAVORITES
+}
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -29,15 +34,32 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val diaryList = viewModel.diaryList.collectAsState(
-        initial = emptyList()
-    ).value
+    var sortState by remember { mutableStateOf(Sort.DESCENDING) }
+
+    var diaryList = viewModel.diaryList.collectAsState(initial = emptyList())
+        .value
+        .filter{
+            if(sortState == Sort.FAVORITES)
+                it.isFavorite
+            else
+                true
+        }
+        .sortedWith(
+            Comparator<Diary>{ d1, d2 ->
+                if(sortState == Sort.DESCENDING){
+                    d2.date.compareTo(d1.date)
+                }else{
+                    d1.date.compareTo(d2.date)
+                }
+            }
+        )
 
     val modalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
     )
     val scaffoldState = rememberScaffoldState()//scaffold state
     val coroutineScope = rememberCoroutineScope()
+
 
     ModalBottomSheetLayout(
         modifier = Modifier. fillMaxHeight(),
@@ -76,7 +98,17 @@ fun HomeScreen(
                                 .background(color = viewModel.themeColor.light)
                         ) {
                             TopBar(viewModel.themeColor.heavy, viewModel.diaryName,
-                                coroutineScope, modalBottomSheetState)
+                                coroutineScope, modalBottomSheetState,
+                                onTapAscendingSort = {
+                                    sortState = Sort.ASCENDING
+                                },
+                                onTapDescendingSort = {
+                                    sortState = Sort.DESCENDING
+                                },
+                                onTapFavoritesSort = {
+                                    sortState = Sort.FAVORITES
+                                }
+                            )
                             LazyVerticalGrid(
                                 columns = GridCells.Fixed(2),
                             ) {

@@ -1,6 +1,7 @@
 package com.example.owndiary.ui.screen
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -25,7 +26,7 @@ class HomeViewModel @Inject constructor(
     ): ViewModel() {
     var themeColor by mutableStateOf(repository.getThemeColor())
     var diaryName: String by mutableStateOf(repository.getDiaryName())
-    val diaryList = repository.getAllDiary()
+    var diaryList = repository.getAllDiary()
 
     var settingThemeColor by mutableStateOf(repository.getThemeColor())
     var settingDiaryName: String by mutableStateOf(repository.getDiaryName())
