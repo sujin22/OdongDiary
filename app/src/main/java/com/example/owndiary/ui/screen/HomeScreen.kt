@@ -83,11 +83,15 @@ fun HomeScreen(
                                 itemsIndexed(diaryList) { index, item ->
                                     ImageCard(
                                         backgroundColor = viewModel.themeColor.middle,
-                                        diary = item
-                                    ) {
-                                        Log.e("ImageCard_Clicked", "${item.id} Clicked")
-                                        navController.navigate("detail_diary/${item.id}")
-                                    }
+                                        diary = item,
+                                        onDiaryClicked = {
+                                            Log.e("ImageCard_Clicked", "${item.id} Clicked")
+                                            navController.navigate("detail_diary/${item.id}")
+                                        },
+                                        onTabFavorite = {
+                                            viewModel.onTapFavorite(item)
+                                        }
+                                    )
                                 }
                             }
 

@@ -31,19 +31,4 @@ class DiaryRepository @Inject constructor(private val diaryDao: DiaryDao){
 
     fun setDiaryName(name: String) = sharedPreferences.setDiaryName(name)
     fun setThemeColor(item: PaletteItem) = sharedPreferences.setThemeColor(item)
-
-    //Data Store
-//    val settingPrefStoreFlow: Flow<SettingItem> = dataStore.data
-//        .map { preferences ->
-//            // Get our show completed value, defaulting to false if not set:
-//            val diaryName = preferences.diaryName
-//            val themeColor = preferences.themeColor
-//            SettingItem(diaryName, themeColor)
-//        }
-//    suspend fun updateShowCompleted(diaryName: String) {
-//        dataStore.edit { preferences ->
-//            preferences[PreferencesKeys.SHOW_COMPLETED] = showCompleted
-//        }
-//    }
-//    data class SettingItem(val diaryName: String, val themeColor: PaletteItem)
 }

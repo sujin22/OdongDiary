@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.owndiary.model.Diary
 import com.example.owndiary.model.PaletteItem
 import com.example.owndiary.repository.DiaryRepository
 import com.example.owndiary.ui.theme.Blue
@@ -40,5 +41,11 @@ class HomeViewModel @Inject constructor(
         repository.setThemeColor(settingThemeColor)
         diaryName = settingDiaryName
         themeColor = settingThemeColor
+    }
+    fun onTapFavorite(diary: Diary){
+        diary.isFavorite = !diary.isFavorite
+        viewModelScope.launch{
+            diary?.let { repository.updateDiary(it) }
+        }
     }
 }
