@@ -6,12 +6,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.owndiary.ui.components.DiaryDialog
 import com.example.owndiary.ui.components.PaletteCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -23,10 +24,34 @@ fun SettingScreen(
     coroutineScope: CoroutineScope,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    var openDeleteDialog by remember{ mutableStateOf(false) }
+
     Surface(
         modifier = Modifier
             .fillMaxHeight(0.9f)
     ) {
+        //삭제 다이얼로그
+        if(openDeleteDialog){
+            DiaryDialog(
+                onDismissRequest ={
+                    openDeleteDialog = false
+                },
+                title = "삭제하시겠습니까?",
+                text="삭제된 일기는 되돌릴 수 없습니다.",
+                confirmText = "삭제",
+                dismissText = "취소",
+                onClickConfirm = {
+                    openDeleteDialog = false
+                    viewModel.onRemoveAllDiary()
+                    coroutineScope.launch {
+                        modalBottomSheetState.hide()
+                    }
+                },
+                onClickDismiss = {
+                    openDeleteDialog = false
+                }
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -116,11 +141,7 @@ fun SettingScreen(
                     .padding(horizontal = 30.dp),
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
-                    /*TODO: Dialog로 더블 체크*/
-                    viewModel.onRemoveAllDiary()
-                    coroutineScope.launch {
-                        modalBottomSheetState.hide()
-                    }
+                    openDeleteDialog = true
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.settingThemeColor.light)
             ) {
