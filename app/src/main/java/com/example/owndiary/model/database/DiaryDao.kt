@@ -1,4 +1,4 @@
-package com.example.owndiary.database
+package com.example.owndiary.model.database
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -27,6 +27,11 @@ interface DiaryDao {
     //테이블의 모든 값 불러오는 메소드
     @Query("SELECT * FROM diary_table")
     fun getAll(): Flow<List<Diary>>
+
+    //테이블의 모든 값 불러오는 메소드
+    @Query("SELECT * FROM diary_table " +
+            "WHERE id >= :position AND id<=:position+:size")
+    fun getAll(position: Int, size: Int): List<Diary>
 
     @Query("DELETE FROM diary_table")
     suspend fun deleteAll()

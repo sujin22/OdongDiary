@@ -5,9 +5,12 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -18,9 +21,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.example.owndiary.model.Diary
 import com.example.owndiary.ui.components.ImageCard
 import com.example.owndiary.ui.components.TopBar
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -34,32 +42,31 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    var sortState by remember { mutableStateOf(Sort.DESCENDING) }
 
-    val diaryList = viewModel.diaryList.collectAsState(initial = emptyList())
-        .value
-        .filter{
-            if(sortState == Sort.FAVORITES)
-                it.isFavorite
-            else
-                true
-        }
-        .sortedWith(
-            Comparator<Diary>{ d1, d2 ->
-                if(sortState == Sort.ASCENDING){
-                    d1.date.compareTo(d2.date)
-                }else{
-                    d2.date.compareTo(d1.date)
-                }
-            }
-        )
+//    val diaryList = viewModel.diaryList.collectAsState(initial = emptyList())
+//        .value
+//        .filter{
+//            if(sortState == Sort.FAVORITES)
+//                it.isFavorite
+//            else
+//                true
+//        }
+//        .sortedWith(
+//            Comparator<Diary>{ d1, d2 ->
+//                if(sortState == Sort.ASCENDING){
+//                    d1.date.compareTo(d2.date)
+//                }else{
+//                    d2.date.compareTo(d1.date)
+//                }
+//            }
+//        )
+    val diaryList = viewModel.diaryList.collectAsLazyPagingItems()
 
     val modalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden
     )
     val scaffoldState = rememberScaffoldState()//scaffold state
     val coroutineScope = rememberCoroutineScope()
-
 
     ModalBottomSheetLayout(
         modifier = Modifier. fillMaxHeight(),
@@ -100,30 +107,31 @@ fun HomeScreen(
                             TopBar(viewModel.themeColor.heavy, viewModel.diaryName,
                                 coroutineScope, modalBottomSheetState,
                                 onTapAscendingSort = {
-                                    sortState = Sort.ASCENDING
+                                    viewModel.sortState = Sort.ASCENDING
                                 },
                                 onTapDescendingSort = {
-                                    sortState = Sort.DESCENDING
+                                    viewModel.sortState = Sort.DESCENDING
                                 },
                                 onTapFavoritesSort = {
-                                    sortState = Sort.FAVORITES
+                                    viewModel.sortState = Sort.FAVORITES
                                 }
                             )
                             LazyVerticalGrid(
                                 modifier = Modifier.fillMaxSize(),
                                 columns = GridCells.Fixed(2),
                             ) {
-                                itemsIndexed(diaryList) { index, item ->
+                                items(diaryList.itemCount) { item ->
+                                    val diary = diaryList[item]!!
                                     ImageCard(
                                         backgroundColor = viewModel.themeColor.middle,
-                                        diary = item,
+                                        diary = diary,
                                         onDiaryClicked = {
-                                            Log.e("ImageCard_Clicked", "${item.id} Clicked")
-                                            navController.navigate("detail_diary/${item.id}")
+                                            Log.e("ImageCard_Clicked", "${diary.id} Clicked")
+                                            navController.navigate("detail_diary/${diary.id}")
                                         },
                                         onTabFavorite = { isFavorite ->
-                                            item.isFavorite = isFavorite
-                                            viewModel.onTapFavorite(item)
+                                            diary.isFavorite = isFavorite
+                                            viewModel.onTapFavorite(diary)
                                         }
                                     )
                                 }

@@ -1,4 +1,4 @@
-package com.example.owndiary.database
+package com.example.owndiary.model.database
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

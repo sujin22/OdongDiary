@@ -1,14 +1,15 @@
 package com.example.owndiary.ui.screen
 
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
 import com.example.owndiary.model.Diary
+import com.example.owndiary.model.DiarySource
 import com.example.owndiary.model.PaletteItem
 import com.example.owndiary.repository.DiaryRepository
 import com.example.owndiary.ui.theme.Blue
@@ -26,7 +27,16 @@ class HomeViewModel @Inject constructor(
     ): ViewModel() {
     var themeColor by mutableStateOf(repository.getThemeColor())
     var diaryName: String by mutableStateOf(repository.getDiaryName())
-    var diaryList = repository.getAllDiary()
+
+    var sortState:Sort by mutableStateOf(Sort.DESCENDING)
+
+//    var diaryList = repository.getAllDiary()
+    var diaryList = Pager(
+        config = PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = false,
+        ), pagingSourceFactory = {DiarySource(repository, sortState)}
+    ).flow
 
     var settingThemeColor by mutableStateOf(repository.getThemeColor())
     var settingDiaryName: String by mutableStateOf(repository.getDiaryName())

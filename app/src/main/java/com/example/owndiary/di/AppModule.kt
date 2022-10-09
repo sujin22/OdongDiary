@@ -2,8 +2,8 @@ package com.example.owndiary.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.owndiary.database.DiaryDao
-import com.example.owndiary.database.DiaryRoomDatabase
+import com.example.owndiary.model.database.DiaryDao
+import com.example.owndiary.model.database.DiaryRoomDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
