@@ -4,9 +4,9 @@
 > 원하는 대로 일기장을 커스터마이징하고, 일기를 쓸 수 있습니다.
 
 ## 목차
-- [주요 기능]
-- [개발 환경]
-- 느낀 점
+- [주요 기능](https://github.com/sujin22/OwnDiary#-%EC%A3%BC%EC%9A%94-%EA%B8%B0%EB%8A%A5-)
+- [개발 환경](https://github.com/sujin22/OwnDiary#-%EA%B0%9C%EB%B0%9C-%ED%99%98%EA%B2%BD-)
+- [회고]
 
 # 📷 주요 기능 📷
 ## 1. 일기 작성
@@ -42,3 +42,6 @@
 - Skill & Library
   - JetPack Compose
   - Room
+
+# 📷 회고 📷
+> 작성 에정입니다.
