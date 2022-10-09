@@ -36,8 +36,8 @@ fun SettingScreen(
                 onDismissRequest ={
                     openDeleteDialog = false
                 },
-                title = "삭제하시겠습니까?",
-                text="삭제된 일기는 되돌릴 수 없습니다.",
+                title = "일기장을 초기화하시겠습니까?",
+                text="모든 일기가 삭제됩니다.",
                 confirmText = "삭제",
                 dismissText = "취소",
                 onClickConfirm = {
