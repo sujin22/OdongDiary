@@ -48,6 +48,7 @@ import com.example.owndiary.MainActivity
 import com.example.owndiary.R
 import com.example.owndiary.model.Diary
 import com.example.owndiary.model.cropCenterBitmap
+import com.example.owndiary.ui.components.DiaryDialog
 import com.example.owndiary.ui.theme.DarkGray
 import com.example.owndiary.ui.theme.LightGray
 import java.time.format.DateTimeFormatter
@@ -61,8 +62,10 @@ fun WriteDiaryScreen(
 ) {
     var isEditState by remember { mutableStateOf(isNew) }
     var isImageLoaded by remember { mutableStateOf(!isNew) }
+    var openDeleteDialog by remember{ mutableStateOf(false)}
 
     val focusManager = LocalFocusManager.current
+
 
     //For Gallery
     val context = LocalContext.current
@@ -83,6 +86,26 @@ fun WriteDiaryScreen(
             }
     )
     {
+        //삭제 다이얼로그
+        if(openDeleteDialog){
+            DiaryDialog(
+                onDismissRequest ={
+                  openDeleteDialog = false
+                },
+                title = "삭제하시겠습니까?",
+                text="삭제된 일기는 되돌릴 수 없습니다.",
+                confirmText = "삭제",
+                dismissText = "취소",
+                onClickConfirm = {
+                    openDeleteDialog = false
+                    viewModel.onRemoveDiary()
+                    navController.navigateUp()
+                },
+                onClickDismiss = {
+                    openDeleteDialog = false
+                }
+            )
+        }
         //bar area
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -127,8 +150,7 @@ fun WriteDiaryScreen(
                         modifier = Modifier
                             .width(40.dp),
                         onClick = {
-                            viewModel.onRemoveDiary()
-                            navController.navigateUp()
+                            openDeleteDialog = true
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.themeColor.middle),
                         contentPadding = PaddingValues(0.dp)

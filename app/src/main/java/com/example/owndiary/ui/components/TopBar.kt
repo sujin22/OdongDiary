@@ -50,16 +50,19 @@ fun TopBar(
                 }) {
                 DropdownMenuItem(onClick = {
                     onTapAscendingSort()
+                    isDropDownMenuExpended = false
                 }) {
                     Text("날짜 오름차순")
                 }
                 DropdownMenuItem(onClick = {
                     onTapDescendingSort()
+                    isDropDownMenuExpended = false
                 }) {
                     Text("날짜 내림차순")
                 }
                 DropdownMenuItem(onClick = {
                     onTapFavoritesSort()
+                    isDropDownMenuExpended = false
                 }) {
                     Text("Favorites")
                 }
