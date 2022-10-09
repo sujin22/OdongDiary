@@ -110,6 +110,7 @@ fun HomeScreen(
                                 }
                             )
                             LazyVerticalGrid(
+                                modifier = Modifier.fillMaxSize(),
                                 columns = GridCells.Fixed(2),
                             ) {
                                 itemsIndexed(diaryList) { index, item ->
