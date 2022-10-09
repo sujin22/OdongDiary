@@ -2,6 +2,7 @@ package com.example.owndiary.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -10,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.owndiary.ui.components.DiaryDialog
@@ -24,20 +27,21 @@ fun SettingScreen(
     coroutineScope: CoroutineScope,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    var openDeleteDialog by remember{ mutableStateOf(false) }
+    var openDeleteDialog by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
 
     Surface(
         modifier = Modifier
             .fillMaxHeight(0.9f)
     ) {
         //삭제 다이얼로그
-        if(openDeleteDialog){
+        if (openDeleteDialog) {
             DiaryDialog(
-                onDismissRequest ={
+                onDismissRequest = {
                     openDeleteDialog = false
                 },
                 title = "일기장을 초기화하시겠습니까?",
-                text="모든 일기가 삭제됩니다.",
+                text = "모든 일기가 삭제됩니다.",
                 confirmText = "삭제",
                 dismissText = "취소",
                 onClickConfirm = {
@@ -55,7 +59,12 @@ fun SettingScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(viewModel.settingThemeColor.middle),
+                .background(viewModel.settingThemeColor.middle)
+                .pointerInput(Unit) {
+                    detectTapGestures {
+                        focusManager.clearFocus()
+                    }
+                },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(10.dp))
@@ -70,6 +79,7 @@ fun SettingScreen(
                     viewModel.onClickApply()
                     coroutineScope.launch {
                         modalBottomSheetState.hide()
+                        focusManager.clearFocus()
                     }
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.settingThemeColor.heavy),
@@ -106,7 +116,7 @@ fun SettingScreen(
                                 viewModel.settingDiaryName = it
                             },
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxWidth(),
                         )
                     }
                 }
@@ -127,6 +137,7 @@ fun SettingScreen(
                     PaletteCard(
                         onClickItem = { item ->
                             viewModel.onClickPaletteItem(item)
+                            focusManager.clearFocus()
                         }
                     )
                     Spacer(Modifier.height(8.dp))
@@ -142,6 +153,7 @@ fun SettingScreen(
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
                     openDeleteDialog = true
+                    focusManager.clearFocus()
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = viewModel.settingThemeColor.light)
             ) {
