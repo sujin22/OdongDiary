@@ -6,7 +6,7 @@
 ## 목차
 - [주요 기능](https://github.com/sujin22/OwnDiary#-%EC%A3%BC%EC%9A%94-%EA%B8%B0%EB%8A%A5-)
 - [개발 환경](https://github.com/sujin22/OwnDiary#-%EA%B0%9C%EB%B0%9C-%ED%99%98%EA%B2%BD-)
-- [회고]
+- [회고](https://github.com/sujin22/OwnDiary#-%ED%9A%8C%EA%B3%A0-)
 
 # 📷 주요 기능 📷
 ## 1. 일기 작성
@@ -44,4 +44,4 @@
   - Room
 
 # 📷 회고 📷
-> 작성 에정입니다.
+> 작성 예정입니다.
