@@ -46,10 +46,10 @@ fun HomeScreen(
         }
         .sortedWith(
             Comparator<Diary>{ d1, d2 ->
-                if(sortState == Sort.DESCENDING){
-                    d2.date.compareTo(d1.date)
-                }else{
+                if(sortState == Sort.ASCENDING){
                     d1.date.compareTo(d2.date)
+                }else{
+                    d2.date.compareTo(d1.date)
                 }
             }
         )
