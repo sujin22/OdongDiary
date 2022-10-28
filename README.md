@@ -44,6 +44,7 @@
 - Skill & Library
   - JetPack Compose
   - Room
+  - Hilt
 
 # 📷 회고 📷
 > 작성 예정입니다.
